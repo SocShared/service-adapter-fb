@@ -1,0 +1,17 @@
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  application:
+    name: microservice-template
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+        name: ${spring.application.name}-config
+      reload:
+        enabled: false
+keycloak:
+  enabled: false

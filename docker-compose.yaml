@@ -1,0 +1,7 @@
+version: '3'
+services:
+  microservice-template:
+    container_name: microservice-template
+    image: vee97/socsh-microservice-template
+    ports:
+      - 8080:8080
