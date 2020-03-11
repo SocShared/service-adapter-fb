@@ -4,4 +4,4 @@ services:
     container_name: socshared-adapter-fb
     image: vee97/socshared-adapter-fb
     ports:
-      - 8080:8080
+      - 8081:8081
