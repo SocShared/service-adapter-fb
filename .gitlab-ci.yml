@@ -1,0 +1,33 @@
+image: java:11
+
+stages:
+  - build
+  - docker-build
+  - docker-push
+  - docker-deploy-swarm
+
+before_script:
+  - chmod +x gradlew
+
+build:
+  stage: build
+  script: ./gradlew clean build
+  artifacts:
+    paths:
+      - build/libs/socshared-adapter-fb-1.0.0-SNAPSHOT.jar
+
+docker-build:
+  stage: docker-build
+  script:
+    - sudo docker build -t vee97/socshared-adapter-fb .
+
+docker-push:
+  stage: docker-push
+  script:
+    - sudo docker login -u "vee97" -p "RabbitVlad1997"
+    - sudo docker push vee97/socshared-adapter-fb
+
+docker-deploy-swarm:
+  stage: docker-deploy-swarm
+  script:
+    - sudo docker stack deploy -c docker-compose.yaml socshared

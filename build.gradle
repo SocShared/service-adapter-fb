@@ -21,6 +21,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-all:1.1.1.RELEASE'
     implementation 'org.keycloak:keycloak-spring-boot-starter:8.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.social:spring-social-facebook:2.0.3.RELEASE'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
     implementation 'com.h2database:h2'
@@ -31,10 +32,10 @@ dependencies {
 }
 
 bootJar {
-    baseName = 'microservice-template'
+    baseName = 'socshared-adapter-fb'
     version = '1.0.0-SNAPSHOT'
 }
 
 springBoot {
-    mainClassName = 'ru.socshared.template.Application'
+    mainClassName = 'ml.socshared.adapter.fb.Application'
 }
