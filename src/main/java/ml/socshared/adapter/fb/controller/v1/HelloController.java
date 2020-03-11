@@ -13,7 +13,7 @@ public class HelloController implements HelloApi {
     @Override
     @GetMapping(value = "/hello", produces = MediaType.APPLICATION_JSON_VALUE)
     public String print() {
-        return "Hello, world";
+        return "Hello from Facebook Adapter";
     }
 
 }
