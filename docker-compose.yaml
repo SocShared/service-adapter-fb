@@ -1,6 +1,6 @@
 version: '3'
 services:
-  microservice-template:
+  socshared-adapter-fb:
     container_name: socshared-adapter-fb
     image: vee97/socshared-adapter-fb
     ports:
