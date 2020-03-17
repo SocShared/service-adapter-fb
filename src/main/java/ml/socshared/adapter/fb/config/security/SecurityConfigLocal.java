@@ -11,13 +11,16 @@ import static ml.socshared.adapter.fb.config.Constants.*;
 
 @Configuration
 @EnableWebSecurity
-@Profile({DEFAULT_PROFILE})
+@Profile({TEST_PROFILE, LOCAL_PROFILE, DEV_PROFILE})
 @Slf4j
 public class SecurityConfigLocal extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         log.info("Run LOCAL/TEST Security Configuration");
+        http.
+                csrf().disable()
+                .authorizeRequests().anyRequest().permitAll();
     }
 
 }
