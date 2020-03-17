@@ -39,9 +39,10 @@ public class FacebookController {
     }
 
     @GetMapping(value = "/forwardLogin", produces = MediaType.APPLICATION_JSON_VALUE)
-    private User getToken(@RequestParam("code") String authorizationCode) {
+    private User getToken(@RequestParam("code") String authorizationCode,
+                          @RequestHeader HttpHeaders headers) {
         OAuth2Operations operations = factory.getOAuthOperations();
-        AccessGrant accessToken = operations.exchangeForAccess(authorizationCode, "http://localhost:8081/api/v1/forwardLogin",
+        AccessGrant accessToken = operations.exchangeForAccess(authorizationCode, headers.getHost() + "/api/v1/forwardLogin",
                 null);
         Connection<Facebook> connection = factory.createConnection(accessToken);
         Facebook facebook = connection.getApi();
