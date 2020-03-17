@@ -29,7 +29,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         OAuth2Operations operations = factory.getOAuthOperations();
         OAuth2Parameters params = new OAuth2Parameters();
 
-        params.setRedirectUri("http://fb.socshared.ml/api/v1/token");
+        params.setRedirectUri("https://fb.socshared.ml/api/v1/token");
         params.setScope("email,public_profile");
 
         String url = operations.buildAuthenticateUrl(params);
@@ -41,7 +41,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     @Override
     public AccessGrant getToken(String authorizationCode, HttpHeaders headers) {
         OAuth2Operations operations = factory.getOAuthOperations();
-        return operations.exchangeForAccess(authorizationCode, "http://fb.socshared.ml/api/v1/token",
+        return operations.exchangeForAccess(authorizationCode, "https://fb.socshared.ml/api/v1/token",
                 null);
     }
 
