@@ -5,3 +5,27 @@ services:
     image: vee97/socshared-adapter-fb
     ports:
       - 8081:8081
+    deploy:
+      replicas: 1
+    environment:
+      SPRING_PROFILE: prod
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: 'facebook_db'
+
+  postgres-db:
+    image: postgres:11
+    secrets:
+      - postgres_password
+    deploy:
+      replicas: 1
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: 'facebook_db'
+
+secrets:
+  postgres_password:
+    external: true

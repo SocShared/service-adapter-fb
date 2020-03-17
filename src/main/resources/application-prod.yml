@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/facebook_db
+    url: jdbc:postgresql://postgres-db:5432/facebook_db
     driver-class-name: org.postgresql.Driver
-    username: admin
-    password: local
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
