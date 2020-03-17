@@ -1,5 +1,7 @@
 package ml.socshared.adapter.fb.controller.v1;
 
+import io.swagger.annotations.ResponseHeader;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Facebook;
@@ -10,10 +12,7 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,12 +24,12 @@ public class FacebookController {
             "355b16f0395f94c27319b5b080068b02");
 
     @GetMapping(value = "/useApplication")
-    public void producer(HttpServletResponse response) throws Exception {
+    public void producer(HttpServletResponse response, @RequestHeader HttpHeaders headers) throws Exception {
 
         OAuth2Operations operations = factory.getOAuthOperations();
         OAuth2Parameters params = new OAuth2Parameters();
 
-        params.setRedirectUri("http://localhost:8081/api/v1/forwardLogin");
+        params.setRedirectUri(headers.getHost() + "/api/v1/forwardLogin");
         params.setScope("email,public_profile");
 
         String url = operations.buildAuthenticateUrl(params);
