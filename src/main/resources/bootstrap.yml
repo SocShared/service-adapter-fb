@@ -6,12 +6,9 @@ server:
 spring:
   application:
     name: socshared-adapter-fb
-  cloud:
-    kubernetes:
-      config:
-        enabled: false
-        name: ${spring.application.name}-config
-      reload:
-        enabled: false
+  social:
+    facebook:
+      appId: 226788808719091
+      appSecret: 355b16f0395f94c27319b5b080068b02
 keycloak:
   enabled: false

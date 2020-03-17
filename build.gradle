@@ -8,27 +8,33 @@ apply plugin: 'io.spring.dependency-management'
 
 repositories {
     jcenter()
+    repositories {
+        maven { url 'https://repo.spring.io/plugins-release' }
+    }
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:2.2.1.RELEASE'
     implementation 'org.springframework.cloud:spring-cloud-starter-sleuth:2.2.1.RELEASE'
     implementation 'org.springframework.cloud:spring-cloud-starter-zipkin:2.2.1.RELEASE'
-    implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-all:1.1.1.RELEASE'
     implementation 'org.keycloak:keycloak-spring-boot-starter:8.0.1'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.social:spring-social-facebook:2.0.3.RELEASE'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
     implementation 'com.h2database:h2'
     implementation 'org.postgresql:postgresql'
     implementation 'com.google.guava:guava:28.1-jre'
+    implementation 'org.springframework.social:spring-social-facebook:3.0.0.M3'
+    implementation 'org.springframework.social:spring-social-config:2.0.0.M4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+configurations {
+    providedRuntime
 }
 
 bootJar {

@@ -19,13 +19,13 @@ build:
 docker-build:
   stage: docker-build
   script:
-    - sudo docker build -t vee97/socshared-adapter-fb .
+    - sudo docker build -t $CI_DOCKER_LOGIN/socshared-adapter-fb .
 
 docker-push:
   stage: docker-push
   script:
-    - sudo docker login -u "vee97" -p "RabbitVlad1997"
-    - sudo docker push vee97/socshared-adapter-fb
+    - sudo docker login -u "$CI_DOCKER_LOGIN" -p "$CI_DOCKER_PASSWORD"
+    - sudo docker push $CI_DOCKER_LOGIN/socshared-adapter-fb
 
 docker-deploy-swarm:
   stage: docker-deploy-swarm
