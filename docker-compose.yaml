@@ -26,6 +26,12 @@ services:
       POSTGRES_PASSWORD: postgres_password
       POSTGRES_DB: 'facebook_db'
 
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:2
+    ports:
+      - 9411:9411
+
 secrets:
   postgres_password:
     external: true

@@ -7,12 +7,13 @@ import org.springframework.social.oauth2.AccessGrant;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 public interface FacebookAuthorizationService {
 
-    void getAccess(HttpServletResponse response, HttpHeaders headers) throws IOException;
+    String getAccess(UUID userId) throws IOException;
 
-    AccessGrant getToken(String authorizationCode, HttpHeaders headers);
+    AccessGrant getToken(UUID userId, String authorizationCode);
 
     Connection<Facebook> getConnection(AccessGrant accessGrant);
 

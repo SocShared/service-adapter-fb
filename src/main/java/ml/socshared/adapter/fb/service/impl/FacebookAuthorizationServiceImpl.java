@@ -1,8 +1,12 @@
 package ml.socshared.adapter.fb.service.impl;
 
+import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
+import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Operations;
@@ -12,37 +16,56 @@ import org.springframework.http.HttpHeaders;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 
 @Service
 public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationService {
 
-    private FacebookConnectionFactory factory;
+    @Value("${facebook.redirect.uri}")
+    private String redirectUri;
 
-    public FacebookAuthorizationServiceImpl(FacebookConnectionFactory facebookConnectionFactory) {
+    private FacebookConnectionFactory factory;
+    private FacebookAccessGrantService fagService;
+
+    public FacebookAuthorizationServiceImpl(FacebookConnectionFactory facebookConnectionFactory,
+                                            FacebookAccessGrantService fagService) {
         this.factory = facebookConnectionFactory;
+        this.fagService = fagService;
     }
 
     @Override
-    public void getAccess(HttpServletResponse response, HttpHeaders headers) throws IOException {
+    public String getAccess(UUID userId) throws IOException {
 
         OAuth2Operations operations = factory.getOAuthOperations();
         OAuth2Parameters params = new OAuth2Parameters();
 
-        params.setRedirectUri("https://fb.socshared.ml/api/v1/token");
-        params.setScope("email,public_profile");
+        params.setRedirectUri(redirectUri + '/' + userId);
+        params.setScope("email,public_profile,publish_to_groups,groups_access_member_info,publish_pages,manage_pages,user_posts");
 
         String url = operations.buildAuthenticateUrl(params);
         System.out.println("The URL is" + url);
-        response.sendRedirect(url);
 
+        return url;
     }
 
     @Override
-    public AccessGrant getToken(String authorizationCode, HttpHeaders headers) {
-        OAuth2Operations operations = factory.getOAuthOperations();
-        return operations.exchangeForAccess(authorizationCode, "https://fb.socshared.ml/api/v1/token",
-                null);
+    public AccessGrant getToken(UUID userId, String authorizationCode) {
+        AccessGrant grant = factory.getOAuthOperations()
+                .exchangeForAccess(authorizationCode, redirectUri + '/' + userId,);
+        if (!saveToken(userId, grant))
+            throw new RuntimeException("Not save token: " + userId);
+        return grant;
+    }
+
+    private boolean saveToken(UUID userId, AccessGrant grant) {
+        FacebookAccessGrant fbAccessGrant = new FacebookAccessGrant();
+        fbAccessGrant.setUserId(userId);
+        fbAccessGrant.setAccessToken(grant.getAccessToken());
+        fbAccessGrant.setExpireTime(grant.getExpireTime());
+        fbAccessGrant.setRefreshToken(grant.getRefreshToken());
+        fbAccessGrant.setScope(grant.getScope());
+        return fagService.save(fbAccessGrant) != null;
     }
 
     @Override

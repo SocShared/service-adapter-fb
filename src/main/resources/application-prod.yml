@@ -10,3 +10,7 @@ spring:
 
 keycloak:
   enabled: false
+
+facebook:
+  redirect:
+    uri: https://fb.socshared.ml/api/v1/token

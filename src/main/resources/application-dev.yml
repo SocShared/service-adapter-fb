@@ -7,6 +7,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  zipkin:
+    base-url: http://zipkin:9411
 
 keycloak:
   enabled: false
+
+facebook:
+  redirect:
+    uri: https://fb.socshared.ml/api/v1/token
