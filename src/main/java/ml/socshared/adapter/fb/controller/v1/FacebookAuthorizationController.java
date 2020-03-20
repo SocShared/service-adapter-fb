@@ -15,6 +15,7 @@ import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -39,5 +40,7 @@ public class FacebookAuthorizationController {
     private AccessGrant getToken(@RequestParam("code") String authorizationCode) {
         return authService.getToken(userId, authorizationCode);
     }
+
+
 
 }

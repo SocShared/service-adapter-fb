@@ -19,7 +19,7 @@ public enum AswErrors {
     CLIENT_ALREADY_EXISTS("Client already exists"),
 
     @ApiModelProperty("Internal error")
-    EXAMPLE("Example errors");
+    NOT_FOUND("Not found exception");
 
     private final String message;
 }
