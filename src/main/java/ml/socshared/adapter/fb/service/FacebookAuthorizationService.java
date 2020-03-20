@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface FacebookAuthorizationService {
 
-    String getAccess(UUID userId) throws IOException;
+    String getAccess() throws IOException;
 
     AccessGrant getToken(UUID userId, String authorizationCode);
 

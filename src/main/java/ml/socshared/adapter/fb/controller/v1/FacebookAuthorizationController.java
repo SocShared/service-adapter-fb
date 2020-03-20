@@ -22,6 +22,7 @@ import java.util.UUID;
 public class FacebookAuthorizationController {
 
     private FacebookAuthorizationService authService;
+    private UUID userId;
 
     public FacebookAuthorizationController(FacebookAuthorizationService authService) {
         this.authService = authService;
@@ -29,12 +30,13 @@ public class FacebookAuthorizationController {
 
     @GetMapping(value = "/access/{userId}")
     public void getAccess(@PathVariable UUID userId, HttpServletResponse response) throws Exception {
-        String url = authService.getAccess(userId);
+        this.userId = userId;
+        String url = authService.getAccess();
         response.sendRedirect(url);
     }
 
-    @GetMapping(value = "/token/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    private AccessGrant getToken(@PathVariable UUID userId, @RequestParam("code") String authorizationCode) {
+    @GetMapping(value = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
+    private AccessGrant getToken(@RequestParam("code") String authorizationCode) {
         return authService.getToken(userId, authorizationCode);
     }
 

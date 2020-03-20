@@ -35,12 +35,12 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public String getAccess(UUID userId) throws IOException {
+    public String getAccess() throws IOException {
 
         OAuth2Operations operations = factory.getOAuthOperations();
         OAuth2Parameters params = new OAuth2Parameters();
 
-        params.setRedirectUri(redirectUri + '/' + userId);
+        params.setRedirectUri(redirectUri);
         params.setScope("email,public_profile,publish_to_groups,groups_access_member_info,publish_pages,manage_pages,user_posts");
 
         String url = operations.buildAuthenticateUrl(params);
@@ -52,7 +52,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     @Override
     public AccessGrant getToken(UUID userId, String authorizationCode) {
         AccessGrant grant = factory.getOAuthOperations()
-                .exchangeForAccess(authorizationCode, redirectUri + '/' + userId, null);
+                .exchangeForAccess(authorizationCode, redirectUri, null);
         if (!saveToken(userId, grant))
             throw new RuntimeException("Not save token: " + userId);
         return grant;
