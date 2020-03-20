@@ -52,7 +52,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     @Override
     public AccessGrant getToken(UUID userId, String authorizationCode) {
         AccessGrant grant = factory.getOAuthOperations()
-                .exchangeForAccess(authorizationCode, redirectUri + '/' + userId,);
+                .exchangeForAccess(authorizationCode, redirectUri + '/' + userId, null);
         if (!saveToken(userId, grant))
             throw new RuntimeException("Not save token: " + userId);
         return grant;
