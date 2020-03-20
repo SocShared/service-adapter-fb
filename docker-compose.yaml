@@ -23,7 +23,7 @@ services:
       - 5432:5432
     environment:
       POSTGRES_USER: 'admin'
-      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_PASSWORD: 'admin'
       POSTGRES_DB: 'facebook_db'
 
   zipkin:
