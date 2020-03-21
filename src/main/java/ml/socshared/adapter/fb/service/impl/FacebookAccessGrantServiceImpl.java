@@ -29,8 +29,9 @@ public class FacebookAccessGrantServiceImpl implements FacebookAccessGrantServic
     }
 
     @Override
-    public FacebookAccessGrant findById(UUID id) {
-        FacebookAccessGrant accessGrant = repository.findById(id).orElseThrow(() -> new HttpNotFoundException("Not found access grant by id: " + id));
+    public FacebookAccessGrant findBySystemUserId(UUID systemUserId) {
+        FacebookAccessGrant accessGrant = repository.findById(systemUserId)
+                .orElseThrow(() -> new HttpNotFoundException("Not found access grant by id: " + systemUserId));
         log.info("Facebook Access Grant: {}", accessGrant);
         return accessGrant;
     }
@@ -43,8 +44,8 @@ public class FacebookAccessGrantServiceImpl implements FacebookAccessGrantServic
     }
 
     @Override
-    public void deleteById(UUID id) {
-        repository.deleteById(id);
-        log.info("Facebook Access Grant: {}", id);
+    public void deleteBySystemUserId(UUID systemUserId) {
+        repository.deleteById(systemUserId);
+        log.info("Facebook Access Grant: {}", systemUserId);
     }
 }

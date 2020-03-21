@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Entity
 @ToString @Getter @Setter
+@EqualsAndHashCode
 @Table(name = "facebook_access_grant")
 public class FacebookAccessGrant {
 

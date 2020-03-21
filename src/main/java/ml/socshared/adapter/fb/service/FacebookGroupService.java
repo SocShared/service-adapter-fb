@@ -1,6 +1,7 @@
 package ml.socshared.adapter.fb.service;
 
 import ml.socshared.adapter.fb.domain.FacebookPost;
+import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.social.facebook.api.Group;
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 public interface FacebookGroupService {
 
-    Group findByUserIdAndGroupId(UUID userId, String groupId);
-    PagedList<GroupMembership> findByUserId(UUID userId);
+    FacebookGroupResponse findBySystemUserIdAndGroupId(UUID systemUserId, String groupId);
+    List<FacebookGroupResponse> findBySystemUserId(UUID systemUserId);
 
 }

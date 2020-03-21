@@ -1,11 +1,9 @@
 package ml.socshared.adapter.fb.controller.v1;
 
 import ml.socshared.adapter.fb.api.v1.rest.FacebookGroupApi;
+import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
 import ml.socshared.adapter.fb.service.FacebookGroupService;
 import org.springframework.http.MediaType;
-import org.springframework.social.facebook.api.Group;
-import org.springframework.social.facebook.api.GroupMembership;
-import org.springframework.social.facebook.api.PagedList;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,14 +23,14 @@ public class FacebookGroupController implements FacebookGroupApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{userId}/groups/{groupId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Group getGroup(@PathVariable UUID userId, @PathVariable String groupId) {
-        return groupService.findByUserIdAndGroupId(userId, groupId);
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookGroupResponse getGroup(@PathVariable UUID systemUserId, @PathVariable String groupId) {
+        return groupService.findBySystemUserIdAndGroupId(systemUserId, groupId);
     }
 
     @Override
-    @GetMapping(value = "/users/{userId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagedList<GroupMembership> getGroups(@PathVariable UUID userId) {
-        return groupService.findByUserId(userId);
+    @GetMapping(value = "/users/{systemUserId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<FacebookGroupResponse> getGroups(@PathVariable UUID systemUserId) {
+        return groupService.findBySystemUserId(systemUserId);
     }
 }

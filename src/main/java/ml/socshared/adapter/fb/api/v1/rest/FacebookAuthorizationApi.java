@@ -14,13 +14,13 @@ public interface FacebookAuthorizationApi {
 
     @ApiOperation(value = "Данные пользователя с токеном", notes = "Возвращает JSON-объект, " +
             "содержащий данные пользователя и токен доступа, по id пользователя Системы.")
-    FacebookUserResponse getUserDataByUserId(UUID userId);
+    FacebookUserResponse getUserDataBySystemUserId(UUID systemUserId);
 
     @ApiIgnore
     FacebookUserResponse getToken(String authorizationCode);
 
     @ApiOperation(value = "Перенаправление на страницу Facebook", notes = "Получение доступа к Facebook для Системы " +
             "с помощью авторизации по OAuth2.0.")
-    void getAccess(UUID userId, HttpServletResponse response) throws Exception;
+    void getAccess(UUID systemUserId, HttpServletResponse response) throws Exception;
 
 }

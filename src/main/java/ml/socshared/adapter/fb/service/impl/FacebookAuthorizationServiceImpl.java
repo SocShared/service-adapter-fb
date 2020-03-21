@@ -16,7 +16,6 @@ import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.UUID;
 
 
@@ -52,19 +51,19 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse getToken(UUID userId, String authorizationCode) {
+    public FacebookUserResponse getToken(UUID systemUserId, String authorizationCode) {
         AccessGrant grant = factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
-        saveToken(userId, grant);
+        saveToken(systemUserId, grant);
         log.info("Token: {}", grant);
 
-        return findUserDataById(userId);
+        return findUserDataBySystemUserId(systemUserId);
     }
 
-    private void saveToken(UUID userId, AccessGrant grant) {
+    private void saveToken(UUID systemUserId, AccessGrant grant) {
         User user = getConnection(grant).getApi().fetchObject("me", User.class, "id");
         FacebookAccessGrant fbAccessGrant = new FacebookAccessGrant();
-        fbAccessGrant.setSystemUserId(userId);
+        fbAccessGrant.setSystemUserId(systemUserId);
         fbAccessGrant.setFacebookUserId(user.getId());
         fbAccessGrant.setAccessToken(grant.getAccessToken());
         fbAccessGrant.setExpireTime(grant.getExpireTime());
@@ -72,7 +71,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         fbAccessGrant.setScope(grant.getScope());
 
         if (fagService.save(fbAccessGrant) != null)
-            throw new HttpBadRequestException("Not save token: " + userId);
+            throw new HttpBadRequestException("Not save token: " + systemUserId);
         log.info("Save Facebook Access Grant: {}", fbAccessGrant);
     }
 
@@ -84,8 +83,8 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse findUserDataById(UUID id) {
-        AccessGrant accessGrant = new AccessGrant(fagService.findById(id).getAccessToken());
+    public FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant);
         User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
         log.info("User: {}", user);
@@ -94,7 +93,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         response.setEmail(user.getEmail());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
-        response.setSystemUserId(id);
+        response.setSystemUserId(systemUserId);
         response.setFacebookUserId(user.getId());
         log.info("Facebook User Response: {}", response);
         return response;

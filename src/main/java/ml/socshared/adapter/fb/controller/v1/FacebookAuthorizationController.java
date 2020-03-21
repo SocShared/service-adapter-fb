@@ -18,16 +18,16 @@ import java.util.UUID;
 public class FacebookAuthorizationController implements FacebookAuthorizationApi {
 
     private FacebookAuthorizationService authService;
-    private UUID userId;
+    private UUID systemUserId;
 
     public FacebookAuthorizationController(FacebookAuthorizationService authService) {
         this.authService = authService;
     }
 
     @Override
-    @GetMapping(value = "/access/{userId}")
-    public void getAccess(@PathVariable UUID userId, HttpServletResponse response) throws Exception {
-        this.userId = userId;
+    @GetMapping(value = "/access/{systemUserId}")
+    public void getAccess(@PathVariable UUID systemUserId, HttpServletResponse response) throws Exception {
+        this.systemUserId = systemUserId;
         String url = authService.getURLForAccess();
         response.sendRedirect(url);
     }
@@ -35,15 +35,15 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
     @Override
     @GetMapping(value = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookUserResponse getToken(@RequestParam("code") String authorizationCode) {
-        if (userId == null)
+        if (systemUserId == null)
             throw new HttpUnavailableRequestException();
-        return authService.getToken(userId, authorizationCode);
+        return authService.getToken(systemUserId, authorizationCode);
     }
 
     @Override
-    @GetMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookUserResponse getUserDataByUserId(@PathVariable UUID userId) {
-        return authService.findUserDataById(userId);
+    @GetMapping(value = "/users/{systemUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookUserResponse getUserDataBySystemUserId(@PathVariable UUID systemUserId) {
+        return authService.findUserDataBySystemUserId(systemUserId);
     }
 
 }
