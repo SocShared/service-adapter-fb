@@ -33,4 +33,10 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         AccessGrant accessGrant = new AccessGrant(fagService.findById(userId).getAccessToken());
         return faService.getConnection(accessGrant).getApi().groupOperations().getMemberships();
     }
+
+    @Override
+    public Group findByUserIdAndGroupId(UUID userId, String groupId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findById(userId).getAccessToken());
+        return faService.getConnection(accessGrant).getApi().groupOperations().getGroup(groupId);
+    }
 }

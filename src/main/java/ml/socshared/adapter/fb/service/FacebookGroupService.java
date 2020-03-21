@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public interface FacebookGroupService {
 
+    Group findByUserIdAndGroupId(UUID userId, String groupId);
     PagedList<GroupMembership> findByUserId(UUID userId);
 
 }

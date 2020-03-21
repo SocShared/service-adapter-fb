@@ -2,6 +2,7 @@ package ml.socshared.adapter.fb.controller.v1;
 
 import ml.socshared.adapter.fb.service.FacebookGroupService;
 import org.springframework.http.MediaType;
+import org.springframework.social.facebook.api.Group;
 import org.springframework.social.facebook.api.GroupMembership;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +23,13 @@ public class FacebookGroupController {
         this.groupService = groupService;
     }
 
-    @GetMapping(value = "/groups/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    private PagedList<GroupMembership> getGroups(@PathVariable UUID userId) {
+    @GetMapping(value = "/users/{userId}/groups/{groupId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Group getGroup(@PathVariable UUID userId, @PathVariable String groupId) {
+        return groupService.findByUserIdAndGroupId(userId, groupId);
+    }
+
+    @GetMapping(value = "/users/{userId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
+    public PagedList<GroupMembership> getGroups(@PathVariable UUID userId) {
         return groupService.findByUserId(userId);
     }
 }
