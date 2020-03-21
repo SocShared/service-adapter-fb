@@ -70,7 +70,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         fbAccessGrant.setRefreshToken(grant.getRefreshToken());
         fbAccessGrant.setScope(grant.getScope());
 
-        if (fagService.save(fbAccessGrant) != null)
+        if (fagService.save(fbAccessGrant) == null)
             throw new HttpBadRequestException("Not save token: " + systemUserId);
         log.info("Save Facebook Access Grant: {}", fbAccessGrant);
     }
