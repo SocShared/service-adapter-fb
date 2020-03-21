@@ -1,5 +1,8 @@
 package ml.socshared.adapter.fb.service;
 
+import ml.socshared.adapter.fb.domain.FacebookPost;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.social.facebook.api.Group;
 import org.springframework.social.facebook.api.GroupMembership;
 import org.springframework.social.facebook.api.PagedList;

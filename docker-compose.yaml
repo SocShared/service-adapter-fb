@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.7'
 services:
   socshared-adapter-fb:
     container_name: socshared-adapter-fb
@@ -10,7 +10,7 @@ services:
     environment:
       SPRING_PROFILE: dev
       POSTGRES_USER: 'admin'
-      POSTGRES_PASSWORD: 'admin'
+      POSTGRES_PASSWORD: postgres_password
       POSTGRES_DB: 'facebook_db'
 
   postgres-db:

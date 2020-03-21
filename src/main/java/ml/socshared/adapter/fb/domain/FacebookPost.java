@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -16,7 +13,10 @@ import java.util.UUID;
 public class FacebookPost {
 
     @Id
-    @GeneratedValue
-    private UUID id;
+    @Column(name = "facebook_post_id")
+    private String facebookPostId;
+
+    @Column(name = "user_id")
+    private UUID userId;
 
 }
