@@ -28,13 +28,13 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
     @GetMapping(value = "/access/{userId}")
     public void getAccess(@PathVariable UUID userId, HttpServletResponse response) throws Exception {
         this.userId = userId;
-        String url = authService.getAccess();
+        String url = authService.getURLForAccess();
         response.sendRedirect(url);
     }
 
     @Override
     @GetMapping(value = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
-    public AccessGrant getToken(@RequestParam("code") String authorizationCode) {
+    public FacebookUserResponse getToken(@RequestParam("code") String authorizationCode) {
         if (userId == null)
             throw new HttpUnavailableRequestException();
         return authService.getToken(userId, authorizationCode);

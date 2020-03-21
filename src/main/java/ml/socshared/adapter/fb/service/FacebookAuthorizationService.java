@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public interface FacebookAuthorizationService {
 
-    String getAccess() throws IOException;
-    AccessGrant getToken(UUID userId, String authorizationCode);
+    String getURLForAccess();
+    FacebookUserResponse getToken(UUID userId, String authorizationCode);
     Connection<Facebook> getConnection(AccessGrant accessGrant);
     FacebookUserResponse findUserDataById(UUID id);
 

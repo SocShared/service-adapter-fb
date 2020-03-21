@@ -24,27 +24,27 @@ public class FacebookAccessGrantServiceImpl implements FacebookAccessGrantServic
     @Override
     public Page<FacebookAccessGrant> findAll(Integer page, Integer size) {
         Page<FacebookAccessGrant> result = repository.findAll(PageRequest.of(page, size));
-        log.info("Request Facebook Access Grant: from {} to {}: {}", page, size, result.getContent());
+        log.info("Facebook Access Grant: from {} to {}: {}", page, size, result.getContent());
         return result;
     }
 
     @Override
     public FacebookAccessGrant findById(UUID id) {
         FacebookAccessGrant accessGrant = repository.findById(id).orElseThrow(() -> new HttpNotFoundException("Not found access grant by id: " + id));
-        log.info("Request Facebook Access Grant: {}", accessGrant);
+        log.info("Facebook Access Grant: {}", accessGrant);
         return accessGrant;
     }
 
     @Override
     public FacebookAccessGrant save(FacebookAccessGrant accessGrant) {
         FacebookAccessGrant result = repository.save(accessGrant);
-        log.info("Save Facebook Access Grant: {}", result);
+        log.info("Facebook Access Grant: {}", result);
         return result;
     }
 
     @Override
     public void deleteById(UUID id) {
         repository.deleteById(id);
-        log.info("Delete Facebook Access Grant: {}", id);
+        log.info("Facebook Access Grant: {}", id);
     }
 }

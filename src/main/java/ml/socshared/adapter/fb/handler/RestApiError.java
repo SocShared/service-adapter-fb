@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ml.socshared.adapter.fb.exception.AswErrors;
+import ml.socshared.adapter.fb.exception.SocsharedErrors;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -26,9 +26,9 @@ public class RestApiError {
     private String path;
     private String message;
     private LocalDateTime timestamp;
-    private AswErrors errorCode;
+    private SocsharedErrors errorCode;
 
-    public RestApiError(Exception exc, HttpStatus status, ServletWebRequest webRequest, AswErrors errorCode) {
+    public RestApiError(Exception exc, HttpStatus status, ServletWebRequest webRequest, SocsharedErrors errorCode) {
         this.status = status.value();
         this.error = status;
         Throwable rootCause = NestedExceptionUtils.getRootCause(exc);

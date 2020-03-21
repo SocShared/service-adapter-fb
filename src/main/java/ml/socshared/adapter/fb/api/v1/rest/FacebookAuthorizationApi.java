@@ -17,7 +17,7 @@ public interface FacebookAuthorizationApi {
     FacebookUserResponse getUserDataByUserId(UUID userId);
 
     @ApiIgnore
-    AccessGrant getToken(String authorizationCode);
+    FacebookUserResponse getToken(String authorizationCode);
 
     @ApiOperation(value = "Перенаправление на страницу Facebook", notes = "Получение доступа к Facebook для Системы " +
             "с помощью авторизации по OAuth2.0.")

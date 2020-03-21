@@ -1,7 +1,9 @@
 package ml.socshared.adapter.fb.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
+import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 
 @Service
+@Slf4j
 public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationService {
 
     @Value("${facebook.redirect.uri}")
@@ -34,8 +37,8 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public String getAccess() throws IOException {
-
+    public String getURLForAccess() {
+        log.info("Init OAuth2.0");
         OAuth2Operations operations = factory.getOAuthOperations();
         OAuth2Parameters params = new OAuth2Parameters();
 
@@ -43,45 +46,57 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         params.setScope("email,public_profile,publish_to_groups,groups_access_member_info,publish_pages,manage_pages,user_posts");
 
         String url = operations.buildAuthenticateUrl(params);
-        System.out.println("The URL is" + url);
+        log.info("URL-redirect: {}" + url);
 
         return url;
     }
 
     @Override
-    public AccessGrant getToken(UUID userId, String authorizationCode) {
+    public FacebookUserResponse getToken(UUID userId, String authorizationCode) {
         AccessGrant grant = factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
-        if (!saveToken(userId, grant))
-            throw new RuntimeException("Not save token: " + userId);
-        return grant;
+        saveToken(userId, grant);
+        log.info("Token: {}", grant);
+
+        return findUserDataById(userId);
     }
 
-    private boolean saveToken(UUID userId, AccessGrant grant) {
+    private void saveToken(UUID userId, AccessGrant grant) {
+        User user = getConnection(grant).getApi().fetchObject("me", User.class, "id");
         FacebookAccessGrant fbAccessGrant = new FacebookAccessGrant();
-        fbAccessGrant.setUserId(userId);
+        fbAccessGrant.setSystemUserId(userId);
+        fbAccessGrant.setFacebookUserId(user.getId());
         fbAccessGrant.setAccessToken(grant.getAccessToken());
         fbAccessGrant.setExpireTime(grant.getExpireTime());
         fbAccessGrant.setRefreshToken(grant.getRefreshToken());
         fbAccessGrant.setScope(grant.getScope());
-        return fagService.save(fbAccessGrant) != null;
+
+        if (fagService.save(fbAccessGrant) != null)
+            throw new HttpBadRequestException("Not save token: " + userId);
+        log.info("Save Facebook Access Grant: {}", fbAccessGrant);
     }
 
     @Override
     public Connection<Facebook> getConnection(AccessGrant accessGrant) {
-        return factory.createConnection(accessGrant);
+        Connection<Facebook> connFacebook = factory.createConnection(accessGrant);
+        log.info("Connection Facebook: {}", connFacebook);
+        return connFacebook;
     }
 
     @Override
     public FacebookUserResponse findUserDataById(UUID id) {
         AccessGrant accessGrant = new AccessGrant(fagService.findById(id).getAccessToken());
+        log.info("Token: {}", accessGrant);
         User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
-        FacebookUserResponse request = new FacebookUserResponse();
-        request.setAccessToken(accessGrant.getAccessToken());
-        request.setEmail(user.getEmail());
-        request.setFirstName(user.getFirstName());
-        request.setLastName(user.getLastName());
-        request.setUserId(id);
-        return request;
+        log.info("User: {}", user);
+        FacebookUserResponse response = new FacebookUserResponse();
+        response.setAccessToken(accessGrant.getAccessToken());
+        response.setEmail(user.getEmail());
+        response.setFirstName(user.getFirstName());
+        response.setLastName(user.getLastName());
+        response.setSystemUserId(id);
+        response.setFacebookUserId(user.getId());
+        log.info("Facebook User Response: {}", response);
+        return response;
     }
 }

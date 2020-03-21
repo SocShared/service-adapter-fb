@@ -1,15 +1,15 @@
 package ml.socshared.adapter.fb.exception.impl;
 
 import ml.socshared.adapter.fb.exception.AbstractRestHandleableException;
-import ml.socshared.adapter.fb.exception.AswErrors;
+import ml.socshared.adapter.fb.exception.SocsharedErrors;
 import org.springframework.http.HttpStatus;
 
 public class HttpUnavailableRequestException extends AbstractRestHandleableException {
     public HttpUnavailableRequestException() {
-        super(AswErrors.UNAVAILABLE_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR);
+        super(SocsharedErrors.UNAVAILABLE_REQUEST, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    public HttpUnavailableRequestException(AswErrors errorCode, HttpStatus httpStatus) {
+    public HttpUnavailableRequestException(SocsharedErrors errorCode, HttpStatus httpStatus) {
         super(errorCode, httpStatus);
     }
 }
