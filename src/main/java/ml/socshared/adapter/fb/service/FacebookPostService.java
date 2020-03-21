@@ -12,8 +12,8 @@ import java.util.UUID;
 public interface FacebookPostService {
 
     String sendPost(UUID userId, FacebookPostRequest post);
-    PagedList<Post> getPostsByUserId(UUID userId, PageRequest pageRequest);
-    PagedList<Post> getPostsByUserIdAndGroupId(UUID userId, String groupId, PageRequest pageRequest);
+    PagedList<Post> getPostsByUserId(UUID userId);
+    PagedList<Post> getPostsByUserIdAndGroupId(UUID userId, String groupId);
     Post getPostByUserIdAndPostId(UUID userId, String postId);
 
 }

@@ -30,6 +30,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                                    FacebookPostRepository postRepository) {
         this.faService = faService;
         this.fagService = fagService;
+        this.postRepository = postRepository;
     }
 
     @Override
@@ -50,13 +51,13 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public PagedList<Post> getPostsByUserId(UUID userId, PageRequest pageRequest) {
+    public PagedList<Post> getPostsByUserId(UUID userId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findById(userId).getAccessToken());
         return faService.getConnection(accessGrant).getApi().feedOperations().getFeed();
     }
 
     @Override
-    public PagedList<Post> getPostsByUserIdAndGroupId(UUID userId, String groupId, PageRequest pageRequest) {
+    public PagedList<Post> getPostsByUserIdAndGroupId(UUID userId, String groupId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findById(userId).getAccessToken());
         return faService.getConnection(accessGrant).getApi().feedOperations().getFeed(groupId);
     }

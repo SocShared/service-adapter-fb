@@ -23,12 +23,12 @@ public class FacebookPostController {
 
     @GetMapping(value = "/users/{userId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
     public PagedList<Post> getPostsByUserId(@PathVariable UUID userId) {
-        return service.getPostsByUserId(userId, null);
+        return service.getPostsByUserId(userId);
     }
 
     @GetMapping(value = "/users/{userId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
     public PagedList<Post> getPostsByUserIdAndGroupId(@PathVariable UUID userId, @PathVariable String groupId) {
-        return service.getPostsByUserIdAndGroupId(userId, groupId, null);
+        return service.getPostsByUserIdAndGroupId(userId, groupId);
     }
 
     @GetMapping(value = "/users/{userId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
