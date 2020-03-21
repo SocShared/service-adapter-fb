@@ -21,7 +21,7 @@ public class FacebookCommentController {
         this.service = service;
     }
 
-    @GetMapping(value = "/users/{systemUserId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users/{systemUserId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<FacebookCommentResponse> findBySystemUserIdAndGroupId(@PathVariable UUID systemUserId, @PathVariable String postId) {
         return service.findBySystemUserIdAndPostId(systemUserId, postId);
     }
