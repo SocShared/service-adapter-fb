@@ -1,2 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:facebook_db?useUnicode=yes&characterEncoding=UTF-8
+    driver-class-name: org.h2.Driver
+    username: sa
+  jpa:
+    hibernate:
+      ddl-auto: update
+  zipkin:
+    enabled: false
+
 keycloak:
   enabled: false
+
+facebook:
+  redirect:
+    uri: http://localhost:8081/api/v1/token
