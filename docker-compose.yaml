@@ -10,7 +10,7 @@ services:
     environment:
       SPRING_PROFILE: dev
       POSTGRES_USER: 'admin'
-      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_PASSWORD: 'admin'
       POSTGRES_DB: 'facebook_db'
 
   postgres-db:
