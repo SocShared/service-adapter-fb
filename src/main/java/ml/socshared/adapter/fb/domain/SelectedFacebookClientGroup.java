@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @ToString @Getter @Setter
 @Table(name = "facebook_client_group")
-public class FacebookClientGroup {
+public class SelectedFacebookClientGroup {
 
     @Id
     @Column(name = "facebook_group_id", nullable = false)

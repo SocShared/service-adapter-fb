@@ -2,13 +2,11 @@ package ml.socshared.adapter.fb.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookPost;
-import ml.socshared.adapter.fb.domain.FacebookPostRequest;
+import ml.socshared.adapter.fb.domain.request.FacebookPostRequest;
 import ml.socshared.adapter.fb.repository.FacebookPostRepository;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookPostService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.facebook.api.Post;
 import org.springframework.social.facebook.api.PostData;

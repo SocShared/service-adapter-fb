@@ -1,6 +1,7 @@
 package ml.socshared.adapter.fb.service.impl;
 
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
+import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +13,7 @@ import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
-import org.springframework.http.HttpHeaders;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -71,5 +70,18 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     @Override
     public Connection<Facebook> getConnection(AccessGrant accessGrant) {
         return factory.createConnection(accessGrant);
+    }
+
+    @Override
+    public FacebookUserResponse findUserDataById(UUID id) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findById(id).getAccessToken());
+        User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
+        FacebookUserResponse request = new FacebookUserResponse();
+        request.setAccessToken(accessGrant.getAccessToken());
+        request.setEmail(user.getEmail());
+        request.setFirstName(user.getFirstName());
+        request.setLastName(user.getLastName());
+        request.setUserId(id);
+        return request;
     }
 }

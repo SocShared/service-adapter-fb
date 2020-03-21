@@ -12,5 +12,9 @@ public class HttpNotFoundException extends AbstractRestHandleableException {
     public HttpNotFoundException(AswErrors errorCode, HttpStatus httpStatus) {
         super(errorCode, httpStatus);
     }
+
+    public HttpNotFoundException(String message) {
+        super(message, AswErrors.NOT_FOUND, HttpStatus.NOT_FOUND);
+    }
 }
 

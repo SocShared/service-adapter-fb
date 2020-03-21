@@ -6,6 +6,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  zipkin:
+    enabled: false
 
 keycloak:
   enabled: false

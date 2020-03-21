@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.controller.v1;
 
+import ml.socshared.adapter.fb.api.v1.rest.FacebookPageApi;
 import ml.socshared.adapter.fb.service.FacebookPageService;
 import org.springframework.http.MediaType;
 import org.springframework.social.facebook.api.Account;
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/v1")
-public class FacebookPageController {
+public class FacebookPageController implements FacebookPageApi {
 
     private FacebookPageService pageService;
 
@@ -21,8 +22,10 @@ public class FacebookPageController {
         this.pageService = service;
     }
 
+    @Override
     @GetMapping(value = "/users/{userId}/pages", produces = MediaType.APPLICATION_JSON_VALUE)
     public PagedList<Account> getAccounts(@PathVariable UUID userId) {
         return pageService.findByUserId(userId);
     }
+
 }

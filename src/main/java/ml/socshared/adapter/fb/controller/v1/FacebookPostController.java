@@ -1,7 +1,6 @@
 package ml.socshared.adapter.fb.controller.v1;
 
-import ml.socshared.adapter.fb.domain.FacebookPost;
-import ml.socshared.adapter.fb.domain.FacebookPostRequest;
+import ml.socshared.adapter.fb.domain.request.FacebookPostRequest;
 import ml.socshared.adapter.fb.service.FacebookPostService;
 import org.springframework.http.MediaType;
 import org.springframework.social.facebook.api.PagedList;

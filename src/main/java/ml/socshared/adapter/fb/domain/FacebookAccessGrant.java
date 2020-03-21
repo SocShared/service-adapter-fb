@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,8 +14,11 @@ import java.util.UUID;
 public class FacebookAccessGrant {
 
     @Id
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(name = "system_user_id", nullable = false)
+    private UUID systemUserId;
+
+    @Column(name = "facebook_user_id", nullable = false, unique = true)
+    private String facebookUserId;
 
     @Column(name = "access_token", nullable = false)
     private String accessToken;
@@ -31,6 +33,6 @@ public class FacebookAccessGrant {
     private Long expireTime;
 
     @OneToMany(mappedBy = "facebookAccessGrant")
-    private Set<FacebookClientGroup> selectedFacebookClientGroups;
+    private Set<SelectedFacebookClientGroup> selectedFacebookClientGroups;
 
 }
