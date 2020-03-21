@@ -7,6 +7,7 @@ import ml.socshared.adapter.fb.service.FacebookGroupService;
 import org.springframework.data.domain.Page;
 import org.springframework.social.facebook.api.Group;
 import org.springframework.social.facebook.api.GroupMembership;
+import org.springframework.social.facebook.api.PagePostData;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
