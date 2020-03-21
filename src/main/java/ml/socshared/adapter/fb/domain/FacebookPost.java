@@ -16,6 +16,12 @@ public class FacebookPost {
     @Column(name = "facebook_post_id")
     private String facebookPostId;
 
+    @Column
+    private String message;
+
+    @Column
+    private String tags;
+
     @Column(name = "user_id")
     private UUID userId;
 

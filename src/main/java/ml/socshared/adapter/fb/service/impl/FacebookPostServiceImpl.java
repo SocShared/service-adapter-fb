@@ -43,6 +43,8 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         FacebookPost facebookPost = new FacebookPost();
         facebookPost.setFacebookPostId(resultId);
         facebookPost.setUserId(userId);
+        facebookPost.setMessage(post.getMessage());
+        facebookPost.setMessage(post.getTags());
         postRepository.save(facebookPost);
         return resultId;
     }
