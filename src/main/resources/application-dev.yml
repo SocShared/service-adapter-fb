@@ -6,7 +6,7 @@ spring:
     password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
   zipkin:
     base-url: http://zipkin:9411/
 
