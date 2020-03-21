@@ -11,15 +11,11 @@ import java.util.UUID;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class FacebookPostResponse {
+public class FacebookCommentResponse {
 
-    private UUID systemUserId;
-    private String facebookPostId;
+    private String facebookCommentId;
     private String facebookUserId;
     private String message;
-    private String tags;
-    private String groupId;
-    private Integer countLikes;
-    private Integer countComments;
+    private Integer likeCount;
 
 }

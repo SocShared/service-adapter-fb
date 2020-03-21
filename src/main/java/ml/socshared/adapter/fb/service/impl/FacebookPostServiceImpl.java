@@ -37,8 +37,8 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public String sendPost(UUID userId, FacebookPostRequest post) {
-        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(userId).getAccessToken());
+    public String sendPost(UUID systemUserId, FacebookPostRequest post) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant);
 
         PostData data = new PostData(post.getGroupId());
@@ -48,7 +48,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         String resultId = faService.getConnection(accessGrant).getApi().feedOperations().post(data);
         FacebookPost facebookPost = new FacebookPost();
         facebookPost.setFacebookPostId(resultId);
-        facebookPost.setUserId(userId);
+        facebookPost.setUserId(systemUserId);
         facebookPost.setMessage(post.getMessage());
         facebookPost.setMessage(post.getTags());
 
@@ -59,8 +59,8 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public List<FacebookPostResponse> findPostsBySystemUserIdAndGroupId(UUID userId, String groupId) {
-        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(userId).getAccessToken());
+    public List<FacebookPostResponse> findPostsBySystemUserIdAndGroupId(UUID systemUserId, String groupId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant);
         FeedOperations operations = faService.getConnection(accessGrant).getApi().feedOperations();
         List<FacebookPostResponse> facebookPostServiceList = new LinkedList<>();
@@ -71,7 +71,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             response.setGroupId(groupId);
             response.setFacebookPostId(s.getId());
             response.setMessage(s.getMessage());
-            response.setSystemUserId(userId);
+            response.setSystemUserId(systemUserId);
             facebookPostServiceList.add(response);
         });
 
@@ -81,21 +81,42 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public FacebookPostResponse findPostBySystemUserIdAndPostId(UUID userId, String postId) {
-        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(userId).getAccessToken());
+    public FacebookPostResponse findPostBySystemUserIdAndPostId(UUID systemUserId, String postId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant);
 
         Post post = faService.getConnection(accessGrant).getApi().feedOperations().getPost(postId);
         FacebookPostResponse response = new FacebookPostResponse();
-        response.setSystemUserId(userId);
+        response.setSystemUserId(systemUserId);
         response.setGroupId(post.getPlace().getId());
         response.setFacebookPostId(postId);
         response.setMessage(post.getMessage());
         response.setFacebookUserId(post.getAdminCreator().getId());
+        response.setCountLikes(getCountLikes(systemUserId, postId));
+        response.setCountComments(getCountComments(systemUserId, postId));
 
         log.info("Facebook Post: {}", response);
 
         return response;
     }
 
+    private Integer getCountLikes(UUID systemUserId, String postId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
+        log.info("Token: {}", accessGrant);
+
+        Integer countLikes = faService.getConnection(accessGrant).getApi().likeOperations().getLikes(postId).size();
+
+        log.info("Number of likes (post: {}): {}", postId, countLikes);
+        return countLikes;
+    }
+
+    private Integer getCountComments(UUID systemUserId, String postId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
+        log.info("Token: {}", accessGrant);
+
+        Integer countLikes = faService.getConnection(accessGrant).getApi().commentOperations().getComments(postId).size();
+
+        log.info("Number of likes (post: {}): {}", postId, countLikes);
+        return countLikes;
+    }
 }
