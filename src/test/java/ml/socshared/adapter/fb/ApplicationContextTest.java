@@ -5,12 +5,17 @@ package ml.socshared.adapter.fb;
 
 import ml.socshared.adapter.fb.integration.AbstractIT;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import static org.junit.Assert.*;
 
 public class ApplicationContextTest extends AbstractIT {
 
+    @Autowired
+    private Application application;
+
     @Test
     public void checkContextStarts() {
-
+        assertNotNull(application);
     }
 
 }
