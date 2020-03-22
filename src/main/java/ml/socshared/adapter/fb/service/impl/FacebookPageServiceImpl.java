@@ -31,7 +31,7 @@ public class FacebookPageServiceImpl implements FacebookPageService {
     @Override
     public List<FacebookPageResponse> findBySystemUserId(UUID systemUserId) {
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
-        log.info("Token: {}", grant);
+        log.info("Token: {}", grant.getAccessToken());
 
         PageOperations operations = faService.getConnection(grant).getApi().pageOperations();
         List<FacebookPageResponse> facebookPageResponseList = new LinkedList<>();

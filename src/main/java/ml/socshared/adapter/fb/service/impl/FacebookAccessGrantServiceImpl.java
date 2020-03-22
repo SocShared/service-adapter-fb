@@ -46,6 +46,6 @@ public class FacebookAccessGrantServiceImpl implements FacebookAccessGrantServic
     @Override
     public void deleteBySystemUserId(UUID systemUserId) {
         repository.deleteById(systemUserId);
-        log.info("Facebook Access Grant: {}", systemUserId);
+        log.info("Facebook Access Grant: id - {}", systemUserId);
     }
 }

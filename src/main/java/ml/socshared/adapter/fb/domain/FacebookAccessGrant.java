@@ -1,17 +1,14 @@
 package ml.socshared.adapter.fb.domain;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@ToString @Getter @Setter
-@EqualsAndHashCode
+@Getter @Setter
 @Table(name = "facebook_access_grant")
 public class FacebookAccessGrant {
 
@@ -35,6 +32,6 @@ public class FacebookAccessGrant {
     private Long expireTime;
 
     @OneToMany(mappedBy = "facebookAccessGrant")
-    private Set<SelectedFacebookClientGroup> selectedFacebookClientGroups;
+    private Set<FacebookAdminClientGroup> facebookAdminClientGroups;
 
 }

@@ -30,7 +30,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     @Override
     public List<FacebookCommentResponse> findBySystemUserIdAndPostId(UUID systemUserId, String postId) {
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
-        log.info("Token: {}", grant);
+        log.info("Token: {}", grant.getAccessToken());
 
         List<FacebookCommentResponse> facebookCommentServiceList = new LinkedList<>();
         CommentOperations operations = faService.getConnection(grant).getApi().commentOperations();
@@ -51,7 +51,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     @Override
     public FacebookCommentResponse findBySystemUserIdAndCommentId(UUID systemUserId, String commentId) {
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
-        log.info("Token: {}", grant);
+        log.info("Token: {}", grant.getAccessToken());
 
         Comment comment = faService.getConnection(grant).getApi().commentOperations().getComment(commentId);
         FacebookCommentResponse response = new FacebookCommentResponse();

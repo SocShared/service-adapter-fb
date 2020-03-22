@@ -45,7 +45,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         params.setScope("email,public_profile,publish_to_groups,groups_access_member_info,publish_pages,manage_pages,user_posts");
 
         String url = operations.buildAuthenticateUrl(params);
-        log.info("URL-redirect: {}" + url);
+        log.info("URL-redirect: {}", url);
 
         return url;
     }
@@ -55,7 +55,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         AccessGrant grant = factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
         saveToken(systemUserId, grant);
-        log.info("Token: {}", grant);
+        log.info("Token: {}", grant.getAccessToken());
 
         return findUserDataBySystemUserId(systemUserId);
     }
@@ -78,16 +78,16 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     @Override
     public Connection<Facebook> getConnection(AccessGrant accessGrant) {
         Connection<Facebook> connFacebook = factory.createConnection(accessGrant);
-        log.info("Connection Facebook: {}", connFacebook);
+        log.info("Connection Facebook: User Name - {}", connFacebook.getDisplayName());
         return connFacebook;
     }
 
     @Override
     public FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
-        log.info("Token: {}", accessGrant);
+        log.info("Token: {}", accessGrant.getAccessToken());
         User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
-        log.info("User: {}", user);
+        log.info("User: {}", user.getId());
         FacebookUserResponse response = new FacebookUserResponse();
         response.setAccessToken(accessGrant.getAccessToken());
         response.setEmail(user.getEmail());
