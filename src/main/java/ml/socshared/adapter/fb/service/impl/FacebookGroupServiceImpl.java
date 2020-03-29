@@ -3,97 +3,245 @@ package ml.socshared.adapter.fb.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.domain.FacebookAdminClientGroup;
+import ml.socshared.adapter.fb.domain.group.TypeGroup;
+import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
-import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
+import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
-import ml.socshared.adapter.fb.repository.FacebookClientGroupRepository;
+import ml.socshared.adapter.fb.repository.FacebookAdminClientGroupRepository;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookGroupService;
-import org.springframework.social.facebook.api.Group;
-import org.springframework.social.facebook.api.GroupMembership;
-import org.springframework.social.facebook.api.GroupOperations;
+import ml.socshared.adapter.fb.service.util.GroupBuffer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 @Slf4j
 public class FacebookGroupServiceImpl implements FacebookGroupService {
 
+    @Value("${facebook.adapter.id}")
+    private String adapterId;
+
     private FacebookAuthorizationService faService;
     private FacebookAccessGrantService fagService;
-    private FacebookClientGroupRepository groupRepository;
+    private FacebookAdminClientGroupRepository groupRepository;
+    private GroupBuffer groupBuffer;
 
     public FacebookGroupServiceImpl(FacebookAuthorizationService faService,
                                     FacebookAccessGrantService fagService,
-                                    FacebookClientGroupRepository groupRepository) {
+                                    FacebookAdminClientGroupRepository groupRepository,
+                                    GroupBuffer groupBuffer) {
         this.faService = faService;
         this.fagService = fagService;
         this.groupRepository = groupRepository;
+        this.groupBuffer = groupBuffer;
     }
 
     @Override
-    public List<FacebookGroupResponse> findBySystemUserId(UUID systemUserId) {
+    public Page<FacebookGroupResponse> findGroupsBySystemUserId(UUID systemUserId, Integer page, Integer size) {
+        if (page < 0)
+            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
+        if (size < 0)
+            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
+        if (size > 100)
+            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
+
+        List<FacebookGroupResponse> facebookGroupResponseList = new LinkedList<>();
+        Page<FacebookGroupResponse> pageResponse = new Page<>();
+        pageResponse.setHasPrev(false);
+        pageResponse.setHasNext(false);
+
+        PagedList<TreeMap> groups = groupBuffer.getBufferGroups(systemUserId, page * size / 100);
+
+        int i, j;
+        for (i = page * size, j = 0; i < groups.size() && j < size; i++, j++) {
+            TreeMap map = groups.get(i);
+
+            boolean isSelect = groupRepository.findById((String) map.get("id")).orElse(null) != null;
+            FacebookGroupResponse response = new FacebookGroupResponse();
+            response.setSystemUserId(systemUserId);
+            response.setGroupId((String) map.get("id"));
+            response.setName((String) map.get("name"));
+            response.setAdapterId(adapterId);
+            response.setIsSelected(isSelect);
+            response.setMembersCount((Integer) map.get("member_count"));
+            response.setType(TypeGroup.FB_GROUP);
+            response.setCreatedDate(OffsetDateTime.parse((String) map.get("created_time"),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+            response.setUpdatedDate(OffsetDateTime.parse((String) map.get("updated_time"),
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+            facebookGroupResponseList.add(response);
+        }
+        pageResponse.setHasNext(i < groups.size());
+
+        log.info("Facebook Groups: size {}: {}", facebookGroupResponseList.size(), facebookGroupResponseList);
+
+        pageResponse.setObjects(facebookGroupResponseList);
+        pageResponse.setPage(page);
+        pageResponse.setSize(size);
+        pageResponse.setHasPrev(page != 0);
+
+        return pageResponse;
+    }
+
+    @Override
+    @Cacheable("pages")
+    public Page<FacebookGroupResponse> findPagesBySystemUserId(UUID systemUserId, Integer page, Integer size) {
+        if (page < 0)
+            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
+        if (size < 0)
+            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
+        if (size > 100)
+            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
+
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
         FacebookAccessGrant userResponse = fagService.findBySystemUserId(systemUserId);
         log.info("User: {}", userResponse.getFacebookUserId());
 
         List<FacebookGroupResponse> facebookGroupResponseList = new LinkedList<>();
-        PagedList<TreeMap> groups = faService.getConnection(accessGrant).getApi()
-                .fetchConnections(userResponse.getFacebookUserId(), "groups", TreeMap.class,
-                        "id", "name", "administrator", "member_count");
+        Page<FacebookGroupResponse> pageResponse = new Page<>();
+        pageResponse.setHasPrev(false);
+        pageResponse.setHasNext(false);
 
-        groups.forEach(s -> {
-            if ((Boolean) s.get("administrator")) {
+        MultiValueMap<String, String> pageParamMap = new LinkedMultiValueMap<>();
+        pageParamMap.put("fields", Collections.singletonList("id,name,talking_about_count,tasks"));
+        pageParamMap.put("limit", Collections.singletonList(size + ""));
+        pageParamMap.put("offset", Collections.singletonList(page * size + ""));
+
+        PagedList<TreeMap> pages = faService.getConnection(accessGrant).getApi()
+                .fetchConnections(userResponse.getFacebookUserId(), "accounts", TreeMap.class, pageParamMap);
+
+        pages.forEach(s -> {
+            boolean isSelect = groupRepository.findById((String) s.get("id")).orElse(null) != null;
+            List tasks = (List) s.get("tasks");
+            boolean isAdmin = tasks.contains("ANALYZE") && tasks.contains("ADVERTISE")
+                    && tasks.contains("MODERATE") && tasks.contains("CREATE_CONTENT") && tasks.contains("MANAGE");
+            if (isAdmin) {
                 FacebookGroupResponse response = new FacebookGroupResponse();
                 response.setSystemUserId(systemUserId);
+                response.setGroupId((String) s.get("id"));
                 response.setName((String) s.get("name"));
-                response.setFacebookGroupId((String) s.get("id"));
-                response.setIsSelected(false);
-                response.setIsAdministrator((Boolean) s.get("administrator"));
-                response.setMembersCount((Integer) s.get("member_count"));
+                response.setAdapterId(adapterId);
+                response.setIsSelected(isSelect);
+                response.setMembersCount((Integer) s.get("talking_about_count"));
+                response.setType(TypeGroup.FB_PAGE);
                 facebookGroupResponseList.add(response);
             }
         });
 
-        facebookGroupResponseList.forEach(s -> {
-            FacebookAdminClientGroup group = new FacebookAdminClientGroup();
-            group.setFacebookAccessGrant(userResponse);
-            group.setFacebookGroupId(s.getFacebookGroupId());
-            groupRepository.save(group);
-        });
-
         log.info("Facebook Groups: size {}: {}", facebookGroupResponseList.size(), facebookGroupResponseList);
 
-        return facebookGroupResponseList;
+        pageResponse.setObjects(facebookGroupResponseList);
+        pageResponse.setPage(page);
+        pageResponse.setSize(size);
+        pageResponse.setHasPrev(pages.getPreviousPage() != null && page != 0);
+        pageResponse.setHasNext(pages.getNextPage() != null && facebookGroupResponseList.size() == size);
+
+        return pageResponse;
     }
 
     @Override
-    public FacebookGroupResponse findBySystemUserIdAndGroupId(UUID systemUserId, String groupId) {
+    public FacebookGroupResponse findGroupBySystemUserIdAndGroupId(UUID systemUserId, String groupId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        groupRepository.findById(groupId).orElseThrow(() -> new HttpNotFoundException("Not found group at the db"));
-
-
         TreeMap group = faService.getConnection(accessGrant).getApi().fetchObject(groupId, TreeMap.class,
-                "id", "name", "member_count");
+                "id", "name", "member_count", "created_time", "updated_time");
 
+        boolean isSelect = groupRepository.findById((String) group.get("id")).orElse(null) != null;
         FacebookGroupResponse response = new FacebookGroupResponse();
-        response.setIsSelected(false);
-        response.setIsAdministrator(true);
-        response.setFacebookGroupId(groupId);
         response.setSystemUserId(systemUserId);
+        response.setGroupId((String) group.get("id"));
         response.setName((String) group.get("name"));
+        response.setAdapterId(adapterId);
+        response.setIsSelected(isSelect);
         response.setMembersCount((Integer) group.get("member_count"));
+        response.setType(TypeGroup.FB_GROUP);
+        response.setCreatedDate(OffsetDateTime.parse((String) group.get("created_time"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+        response.setUpdatedDate(OffsetDateTime.parse((String) group.get("updated_time"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+
         log.info("Facebook Group: {}", response);
 
         return response;
     }
 
+    @Override
+    public FacebookGroupResponse findPageBySystemUserIdAndPageId(UUID systemUserId, String pageId) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
+        log.info("Token: {}", accessGrant.getAccessToken());
 
+        TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class,
+                "id", "name", "talking_about_count");
+
+        boolean isSelect = groupRepository.findById((String) page.get("id")).orElse(null) != null;
+        FacebookGroupResponse response = new FacebookGroupResponse();
+        response.setSystemUserId(systemUserId);
+        response.setGroupId((String) page.get("id"));
+        response.setName((String) page.get("name"));
+        response.setAdapterId(adapterId);
+        response.setIsSelected(isSelect);
+        response.setMembersCount((Integer) page.get("talking_about_count"));
+        response.setType(TypeGroup.FB_PAGE);
+
+        log.info("Facebook Group: {}", response);
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Boolean> selectGroupOrPage(UUID systemUserId, String groupOrPageId, Boolean isSelect) {
+        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
+        log.info("Token: {}", accessGrant.getAccessToken());
+
+        TreeMap group = faService.getConnection(accessGrant).getApi().fetchObject(groupOrPageId, TreeMap.class, "id", "member_count");
+
+        if (group != null && group.get("member_count") != null) {
+            FacebookAdminClientGroup g = new FacebookAdminClientGroup();
+            g.setFacebookAccessGrant(fagService.findBySystemUserId(systemUserId));
+            g.setFacebookGroupId((String) group.get("id"));
+            g.setType(TypeGroup.FB_GROUP);
+
+            groupRepository.save(g);
+            return new HashMap<>() {
+                {
+                    put("success", true);
+                }
+            };
+        }
+
+        TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(groupOrPageId, TreeMap.class, "id", "talking_about_count");
+
+        if (page != null && page.get("talking_about_count") != null) {
+            FacebookAdminClientGroup p = new FacebookAdminClientGroup();
+            p.setFacebookAccessGrant(fagService.findBySystemUserId(systemUserId));
+            p.setFacebookGroupId((String) page.get("id"));
+            p.setType(TypeGroup.FB_PAGE);
+
+            groupRepository.save(p);
+            return new HashMap<>() {
+                {
+                    put("success", true);
+                }
+            };
+        }
+
+        return new HashMap<>() {
+            {
+                put("success", false);
+            }
+        };
+    }
 }

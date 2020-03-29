@@ -31,9 +31,7 @@ public class RestApiError {
     public RestApiError(Exception exc, HttpStatus status, ServletWebRequest webRequest, SocsharedErrors errorCode) {
         this.status = status.value();
         this.error = status;
-        Throwable rootCause = NestedExceptionUtils.getRootCause(exc);
-        if (rootCause != null)
-            this.message = rootCause.getMessage();
+        this.message = exc.getMessage();
         this.timestamp = LocalDateTime.now();
         this.path = webRequest.getRequest().getRequestURI();
         this.errorCode = errorCode;

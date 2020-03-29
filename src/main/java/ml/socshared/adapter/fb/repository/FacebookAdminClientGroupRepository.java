@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface FacebookClientGroupRepository extends JpaRepository<FacebookAdminClientGroup, String> {
+public interface FacebookAdminClientGroupRepository extends JpaRepository<FacebookAdminClientGroup, String> {
 }

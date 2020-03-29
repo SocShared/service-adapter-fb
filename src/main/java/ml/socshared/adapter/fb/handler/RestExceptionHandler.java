@@ -3,8 +3,10 @@ package ml.socshared.adapter.fb.handler;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.exception.AbstractRestHandleableException;
 import ml.socshared.adapter.fb.exception.SocsharedErrors;
+import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.social.RateLimitExceededException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,5 +36,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         log.error(exc.getMessage());
         return buildErrorResponse(exc, HttpStatus.NOT_FOUND, webRequest, SocsharedErrors.NOT_FOUND);
     }
+
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, RateLimitExceededException exc) {
+        log.error(exc.getMessage());
+        return buildErrorResponse(exc, HttpStatus.BAD_GATEWAY, webRequest, SocsharedErrors.BAD_GATEWAY);
+    }
+
 }
 

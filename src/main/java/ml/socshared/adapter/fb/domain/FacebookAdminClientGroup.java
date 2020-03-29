@@ -2,6 +2,7 @@ package ml.socshared.adapter.fb.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import ml.socshared.adapter.fb.domain.group.TypeGroup;
 
 import javax.persistence.*;
 
@@ -14,11 +15,11 @@ public class FacebookAdminClientGroup {
     @Column(name = "facebook_group_id")
     private String facebookGroupId;
 
-    @Column(name = "is_selected")
-    private Boolean isSelected;
+    @Column(name = "type")
+    private TypeGroup type;
 
     @ManyToOne
-    @JoinColumn(name = "systemUserName", nullable = false)
+    @JoinColumn(name = "systemUserId", nullable = false)
     private FacebookAccessGrant facebookAccessGrant;
 
 }

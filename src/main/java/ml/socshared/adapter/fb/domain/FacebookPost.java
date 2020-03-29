@@ -21,10 +21,7 @@ public class FacebookPost {
     @Column
     private String message;
 
-    @Column
-    private String tags;
-
-    @Column(name = "user_id")
-    private UUID userId;
+    @Column(name = "system_user_id")
+    private UUID systemUserId;
 
 }

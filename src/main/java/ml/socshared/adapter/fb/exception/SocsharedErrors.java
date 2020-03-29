@@ -25,7 +25,10 @@ public enum SocsharedErrors {
     UNAVAILABLE_REQUEST("Unavailable request"),
 
     @ApiModelProperty("Internal error")
-    BAD_REQUEST("Bad request");
+    BAD_REQUEST("Bad request"),
+
+    @ApiModelProperty("Internal error")
+    BAD_GATEWAY("Bad gateway");
 
     private final String message;
 }

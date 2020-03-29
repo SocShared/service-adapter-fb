@@ -9,8 +9,8 @@ import lombok.ToString;
 @Setter
 @ToString
 @EqualsAndHashCode
-public class FacebookPostRequest {
+public class FacebookSelectGroupRequest {
 
-    private String message;
+    private Boolean isSelected;
 
 }

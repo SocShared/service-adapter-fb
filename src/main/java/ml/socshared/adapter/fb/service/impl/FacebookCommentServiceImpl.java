@@ -36,8 +36,8 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
         CommentOperations operations = faService.getConnection(grant).getApi().commentOperations();
         operations.getComments(postId).forEach(s -> {
             FacebookCommentResponse response = new FacebookCommentResponse();
-            response.setFacebookCommentId(s.getId());
-            response.setFacebookUserId(s.getFrom().getId());
+            response.setCommentId(s.getId());
+            response.setUserId(s.getFrom().getId());
             response.setLikeCount(s.getLikeCount());
             response.setMessage(s.getMessage());
             facebookCommentServiceList.add(response);
@@ -55,8 +55,8 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
         Comment comment = faService.getConnection(grant).getApi().commentOperations().getComment(commentId);
         FacebookCommentResponse response = new FacebookCommentResponse();
-        response.setFacebookCommentId(comment.getId());
-        response.setFacebookUserId(comment.getFrom().getId());
+        response.setCommentId(comment.getId());
+        response.setUserId(comment.getFrom().getId());
         response.setLikeCount(comment.getLikeCount());
         response.setMessage(comment.getMessage());
 

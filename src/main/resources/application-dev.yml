@@ -16,3 +16,5 @@ keycloak:
 facebook:
   redirect:
     uri: https://fb.socshared.ml/api/v1/token
+  adapter:
+    id: fb-adapter-dev

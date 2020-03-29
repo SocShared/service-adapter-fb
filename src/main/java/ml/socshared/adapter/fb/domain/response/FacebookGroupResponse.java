@@ -4,7 +4,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ml.socshared.adapter.fb.domain.group.TypeGroup;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -14,10 +17,13 @@ import java.util.UUID;
 public class FacebookGroupResponse {
 
     private UUID systemUserId;
-    private String facebookGroupId;
+    private String groupId;
     private String name;
-    private Integer membersCount;
-    private Boolean isAdministrator;
+    private String adapterId;
     private Boolean isSelected;
+    private Integer membersCount;
+    private TypeGroup type;
+    private LocalDateTime createdDate;
+    private LocalDateTime updatedDate;
 
 }

@@ -7,6 +7,7 @@ import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
@@ -76,6 +77,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
+    @Cacheable("connection")
     public Connection<Facebook> getConnection(AccessGrant accessGrant) {
         Connection<Facebook> connFacebook = factory.createConnection(accessGrant);
         log.info("Connection Facebook: User Name - {}", connFacebook.getDisplayName());
@@ -94,7 +96,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setSystemUserId(systemUserId);
-        response.setFacebookUserId(user.getId());
+        response.setUserId(user.getId());
         log.info("Facebook User Response: {}", response);
         return response;
     }

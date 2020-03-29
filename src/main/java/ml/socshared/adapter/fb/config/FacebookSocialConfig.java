@@ -1,4 +1,4 @@
-package ml.socshared.adapter.fb.config.facebook;
+package ml.socshared.adapter.fb.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -14,12 +15,16 @@ import java.util.UUID;
 public class FacebookPostResponse {
 
     private UUID systemUserId;
-    private String facebookPostId;
-    private String facebookUserId;
-    private String message;
-    private String tags;
     private String groupId;
-    private Integer countLikes;
-    private Integer countComments;
+    private String postId;
+    private String userId;
+    private String adapterId;
+    private String message;
+    private Integer likesCount;
+    private Integer commentsCount;
+    private Integer repostsCount;
+    private Integer viewsCount;
+    private Date createdDate;
+    private Date updatedDate;
 
 }

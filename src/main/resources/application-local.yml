@@ -15,3 +15,5 @@ keycloak:
 facebook:
   redirect:
     uri: http://localhost:8081/api/v1/token
+  adapter:
+    id: fb-adapter-local

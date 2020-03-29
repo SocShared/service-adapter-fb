@@ -14,7 +14,7 @@ import java.util.UUID;
 public class FacebookUserResponse {
 
     private UUID systemUserId;
-    private String facebookUserId;
+    private String userId;
     private String firstName;
     private String lastName;
     private String email;

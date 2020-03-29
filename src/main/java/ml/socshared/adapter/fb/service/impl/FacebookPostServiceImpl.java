@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.UUID;
 
 @Service
@@ -41,7 +42,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        PostData data = new PostData(post.getGroupId());
+        /*PostData data = new PostData(post.getGroupId());
         data.message(post.getMessage());
         if (post.getTags() != null)
             data.tags(post.getTags().split(","));
@@ -55,22 +56,25 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         FacebookPost result = postRepository.save(facebookPost);
         log.info("Facebook Post: {}", result);
 
-        return resultId;
+        return resultId; */
+        return null;
     }
 
     @Override
     public List<FacebookPostResponse> findPostsBySystemUserIdAndGroupId(UUID systemUserId, String groupId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
-        FeedOperations operations = faService.getConnection(accessGrant).getApi().feedOperations();
-        List<FacebookPostResponse> facebookPostServiceList = new LinkedList<>();
 
-        operations.getFeed(groupId).forEach(s -> {
+        List<FacebookPostResponse> facebookPostServiceList = new LinkedList<>();
+        PagedList<TreeMap> posts = faService.getConnection(accessGrant).getApi().fetchConnections(groupId,
+                "feed", TreeMap.class, "id", "message", "created_time");
+
+        posts.forEach(s -> {
             FacebookPostResponse response = new FacebookPostResponse();
-            response.setFacebookUserId(s.getAdminCreator().getId());
+            //response.setFacebookUserId();
             response.setGroupId(groupId);
-            response.setFacebookPostId(s.getId());
-            response.setMessage(s.getMessage());
+            response.setPostId((String) s.get("id"));
+            response.setMessage((String) s.get("message"));
             response.setSystemUserId(systemUserId);
             facebookPostServiceList.add(response);
         });
@@ -89,11 +93,11 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         FacebookPostResponse response = new FacebookPostResponse();
         response.setSystemUserId(systemUserId);
         response.setGroupId(post.getPlace().getId());
-        response.setFacebookPostId(postId);
+        response.setPostId(postId);
         response.setMessage(post.getMessage());
-        response.setFacebookUserId(post.getAdminCreator().getId());
-        response.setCountLikes(getCountLikes(systemUserId, postId));
-        response.setCountComments(getCountComments(systemUserId, postId));
+        response.setUserId(post.getAdminCreator().getId());
+        response.setLikesCount(getCountLikes(systemUserId, postId));
+        response.setCommentsCount(getCountComments(systemUserId, postId));
 
         log.info("Facebook Post: {}", response);
 
