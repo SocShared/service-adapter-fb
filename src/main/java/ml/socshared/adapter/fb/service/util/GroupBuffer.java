@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.oauth2.AccessGrant;
@@ -19,6 +20,9 @@ import java.util.UUID;
 @Slf4j
 public class GroupBuffer {
 
+    @Value("${cache.groups}")
+    private final String groups = "groups";
+
     private FacebookAuthorizationService faService;
     private FacebookAccessGrantService fagService;
 
@@ -28,7 +32,7 @@ public class GroupBuffer {
         this.fagService = fagService;
     }
 
-    @Cacheable("groupsBufferHundred")
+    @Cacheable(groups)
     public PagedList<TreeMap> getBufferGroups(UUID systemUserId, Integer countPage) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());

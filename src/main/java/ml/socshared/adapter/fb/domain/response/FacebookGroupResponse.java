@@ -23,7 +23,5 @@ public class FacebookGroupResponse {
     private Boolean isSelected;
     private Integer membersCount;
     private TypeGroup type;
-    private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
 
 }

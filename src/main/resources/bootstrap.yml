@@ -11,3 +11,9 @@ spring:
       appSecret: 355b16f0395f94c27319b5b080068b02
 keycloak:
   enabled: false
+
+cache:
+  pages: pages
+  groups: groups
+  posts: posts
+  comments: comments

@@ -19,6 +19,6 @@ public interface FacebookGroupService {
     FacebookGroupResponse findPageBySystemUserIdAndPageId(UUID systemUserId, String pageId);
     Page<FacebookGroupResponse> findGroupsBySystemUserId(UUID systemUserId, Integer page, Integer size);
     Page<FacebookGroupResponse> findPagesBySystemUserId(UUID systemUserId, Integer page, Integer size);
-    Map<String, Boolean> selectGroupOrPage(UUID systemUserId, String groupOrPageId, Boolean isSelect);
+    Map<String, Boolean> selectPage(UUID systemUserId, String groupOrPageId, Boolean isSelect);
 
 }

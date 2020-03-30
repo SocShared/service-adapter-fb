@@ -30,9 +30,9 @@ public class FacebookGroupController implements FacebookGroupApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookGroupResponse getGroup(@PathVariable UUID systemUserId, @PathVariable String groupId) {
-        return groupService.findGroupBySystemUserIdAndGroupId(systemUserId, groupId);
+    @GetMapping(value = "/users/{systemUserId}/groups/{pageId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookGroupResponse getGroup(@PathVariable UUID systemUserId, @PathVariable String pageId) {
+        return groupService.findPageBySystemUserIdAndPageId(systemUserId, pageId);
     }
 
     @Override
@@ -44,33 +44,15 @@ public class FacebookGroupController implements FacebookGroupApi {
             throw new HttpBadRequestException("Error: page parameter not set.");
         if (size == null)
             throw new HttpBadRequestException("Error: size parameter not set.");
-        return groupService.findGroupsBySystemUserId(systemUserId, page, size);
-    }
-
-    @Override
-    @GetMapping(value = "/users/{systemUserId}/pages/{pageId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookGroupResponse getPage(@PathVariable UUID systemUserId, @PathVariable String pageId) {
-        return groupService.findPageBySystemUserIdAndPageId(systemUserId, pageId);
-    }
-
-    @Override
-    @GetMapping(value = "/users/{systemUserId}/pages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<FacebookGroupResponse> getPages(@PathVariable UUID systemUserId,
-                                                 @RequestParam(name = "page", required = false) Integer page,
-                                                 @RequestParam(name = "size", required = false) Integer size) {
-        if (page == null)
-            throw new HttpBadRequestException("Error: page parameter not set.");
-        if (size == null)
-            throw new HttpBadRequestException("Error: size parameter not set.");
         return groupService.findPagesBySystemUserId(systemUserId, page, size);
     }
 
     @Override
-    @PostMapping(value = "/users/{systemUserId}/groups/{groupOrPageId}", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/users/{systemUserId}/groups/{groupId}", consumes = MediaType.APPLICATION_JSON_VALUE,
                                                                         produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Boolean> selectGroupOrPage(@PathVariable UUID systemUserId,
-                                                  @PathVariable String groupOrPageId,
+    public Map<String, Boolean> selectGroup(@PathVariable UUID systemUserId,
+                                                  @PathVariable String groupId,
                                                   @RequestBody FacebookSelectGroupRequest request) {
-        return groupService.selectGroupOrPage(systemUserId, groupOrPageId, request.getIsSelected());
+        return groupService.selectPage(systemUserId, groupId, request.getIsSelected());
     }
 }

@@ -2,20 +2,31 @@ package ml.socshared.adapter.fb.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookPost;
+import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.request.FacebookPostRequest;
 import ml.socshared.adapter.fb.domain.response.FacebookPostResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
+import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.repository.FacebookPostRepository;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookPostService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.social.UncategorizedApiException;
 import org.springframework.social.facebook.api.FeedOperations;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.facebook.api.Post;
 import org.springframework.social.facebook.api.PostData;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
@@ -25,102 +36,203 @@ import java.util.UUID;
 @Slf4j
 public class FacebookPostServiceImpl implements FacebookPostService {
 
+    @Value("${facebook.adapter.id}")
+    private String adapterId;
+
+    @Value("${cache.posts}")
+    private final String posts = "posts";
+
     private FacebookAuthorizationService faService;
     private FacebookAccessGrantService fagService;
-    private FacebookPostRepository postRepository;
 
     public FacebookPostServiceImpl(FacebookAuthorizationService faService,
-                                   FacebookAccessGrantService fagService,
-                                   FacebookPostRepository postRepository) {
+                                   FacebookAccessGrantService fagService) {
         this.faService = faService;
         this.fagService = fagService;
-        this.postRepository = postRepository;
     }
 
     @Override
-    public String sendPost(UUID systemUserId, FacebookPostRequest post) {
+    public FacebookPostResponse getPostByPostIdOfPage(UUID systemUserId, String pageId, String postId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        /*PostData data = new PostData(post.getGroupId());
-        data.message(post.getMessage());
-        if (post.getTags() != null)
-            data.tags(post.getTags().split(","));
-        String resultId = faService.getConnection(accessGrant).getApi().feedOperations().post(data);
-        FacebookPost facebookPost = new FacebookPost();
-        facebookPost.setFacebookPostId(resultId);
-        facebookPost.setUserId(systemUserId);
-        facebookPost.setMessage(post.getMessage());
-        facebookPost.setMessage(post.getTags());
+        try {
+            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            accessGrant = new AccessGrant((String) page.get("access_token"));
 
-        FacebookPost result = postRepository.save(facebookPost);
-        log.info("Facebook Post: {}", result);
+            try {
+                TreeMap post = faService.getConnection(accessGrant).getApi()
+                        .fetchObject(pageId + "_" + postId, TreeMap.class, "id,message,from{id},created_time,updated_time," +
+                                "insights.metric(post_impressions,post_reactions_by_type_total){name,values},comments.summary(1).limit(0){summary},shares");
 
-        return resultId; */
-        return null;
+                if (post == null)
+                    throw new HttpNotFoundException("Not found post by id: " + postId);
+
+                FacebookPostResponse response = new FacebookPostResponse();
+                response.setGroupId(pageId);
+                response.setPostId(((String) post.get("id")).split("_")[1]);
+                response.setMessage((String) post.get("message"));
+                response.setSystemUserId(systemUserId);
+                response.setUserId((String) ((TreeMap) post.get("from")).get("id"));
+                response.setCreatedDate(OffsetDateTime.parse((String) post.get("created_time"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+                response.setUpdatedDate(OffsetDateTime.parse((String) post.get("updated_time"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+                response.setCommentsCount((Integer) ((TreeMap) ((TreeMap) post.get("comments")).get("summary")).get("total_count"));
+                response.setRepostsCount(((TreeMap) post.get("shares")).get("count") == null ? 0 : (Integer) ((TreeMap) post.get("shares")).get("count"));
+                response.setAdapterId(adapterId);
+
+                TreeMap[] insights = (TreeMap[]) ((TreeMap) post.get("insights")).get("data");
+                for (TreeMap ins : insights) {
+                    if (ins.get("name").equals("post_impressions")) {
+                        response.setViewsCount((Integer) ((TreeMap[]) ins.get("values"))[0].get("value"));
+                    }
+                    if (ins.get("name").equals("post_reactions_by_type_total")) {
+                        TreeMap reactions = (TreeMap) ((TreeMap[]) ins.get("values"))[0].get("value");
+                        int like = reactions.get("like") == null ? 0 : (Integer) reactions.get("like");
+                        int love = reactions.get("love") == null ? 0 : (Integer) reactions.get("love");
+                        int wow = reactions.get("wow") == null ? 0 : (Integer) reactions.get("wow");
+                        int haha = reactions.get("haha") == null ? 0 : (Integer) reactions.get("haha");
+                        int sorry = reactions.get("sorry") == null ? 0 : (Integer) reactions.get("sorry");
+                        int anger = reactions.get("anger") == null ? 0 : (Integer) reactions.get("anger");
+
+                        response.setLikesCount(like + love + wow);
+                        response.setDislikesCount(haha + sorry + anger);
+                    }
+                }
+
+                return response;
+            } catch (UncategorizedApiException exc) {
+                throw new HttpNotFoundException("Not found post by id: " + postId);
+            }
+        } catch (UncategorizedApiException exc) {
+            throw new HttpNotFoundException("Not found page by id: " + pageId);
+        }
     }
 
     @Override
-    public List<FacebookPostResponse> findPostsBySystemUserIdAndGroupId(UUID systemUserId, String groupId) {
+    @Cacheable(posts)
+    public Page<FacebookPostResponse> getPostsByPageId(UUID systemUserId, String pageId, Integer page, Integer size) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        List<FacebookPostResponse> facebookPostServiceList = new LinkedList<>();
-        PagedList<TreeMap> posts = faService.getConnection(accessGrant).getApi().fetchConnections(groupId,
-                "feed", TreeMap.class, "id", "message", "created_time");
+        try {
+            TreeMap pageUser = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            accessGrant = new AccessGrant((String) pageUser.get("access_token"));
 
-        posts.forEach(s -> {
-            FacebookPostResponse response = new FacebookPostResponse();
-            //response.setFacebookUserId();
-            response.setGroupId(groupId);
-            response.setPostId((String) s.get("id"));
-            response.setMessage((String) s.get("message"));
-            response.setSystemUserId(systemUserId);
-            facebookPostServiceList.add(response);
-        });
+            List<FacebookPostResponse> facebookPostServiceList = new LinkedList<>();
 
-        log.info("Facebook Posts: size: {}: {}", facebookPostServiceList.size(), facebookPostServiceList);
+            MultiValueMap<String, String> postParamMap = new LinkedMultiValueMap<>();
+            postParamMap.put("fields", Collections.singletonList("id,message,from{id},created_time,updated_time," +
+                    "insights.metric(post_impressions,post_reactions_by_type_total){name,values},comments.summary(1).limit(0){summary},shares"));
+            postParamMap.put("limit", Collections.singletonList(size + ""));
+            postParamMap.put("offset", Collections.singletonList(page * size + ""));
 
-        return facebookPostServiceList;
+            PagedList<TreeMap> posts = faService.getConnection(accessGrant).getApi().fetchConnections(pageId,
+                    "posts", TreeMap.class, postParamMap);
+
+            posts.forEach(s -> {
+                FacebookPostResponse response = new FacebookPostResponse();
+                response.setGroupId(pageId);
+                response.setPostId(((String) s.get("id")).split("_")[1]);
+                response.setMessage((String) s.get("message"));
+                response.setSystemUserId(systemUserId);
+                response.setUserId((String) ((TreeMap) s.get("from")).get("id"));
+                response.setCreatedDate(OffsetDateTime.parse((String) s.get("created_time"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+                response.setUpdatedDate(OffsetDateTime.parse((String) s.get("updated_time"),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
+                response.setCommentsCount((Integer) ((TreeMap) ((TreeMap) s.get("comments")).get("summary")).get("total_count"));
+                response.setRepostsCount(((TreeMap) s.get("shares")).get("count") == null ? 0 : (Integer) ((TreeMap) s.get("shares")).get("count"));
+                response.setAdapterId(adapterId);
+
+                TreeMap[] insights = (TreeMap[]) ((TreeMap) s.get("insights")).get("data");
+                for (TreeMap ins : insights) {
+                    if (ins.get("name").equals("post_impressions")) {
+                        response.setViewsCount((Integer) ((TreeMap[]) ins.get("values"))[0].get("value"));
+                    }
+                    if (ins.get("name").equals("post_reactions_by_type_total")) {
+                        TreeMap reactions = (TreeMap) ((TreeMap[]) ins.get("values"))[0].get("value");
+                        int like = reactions.get("like") == null ? 0 : (Integer) reactions.get("like");
+                        int love = reactions.get("love") == null ? 0 : (Integer) reactions.get("love");
+                        int wow = reactions.get("wow") == null ? 0 : (Integer) reactions.get("wow");
+                        int haha = reactions.get("haha") == null ? 0 : (Integer) reactions.get("haha");
+                        int sorry = reactions.get("sorry") == null ? 0 : (Integer) reactions.get("sorry");
+                        int anger = reactions.get("anger") == null ? 0 : (Integer) reactions.get("anger");
+
+                        response.setLikesCount(like + love + wow);
+                        response.setDislikesCount(haha + sorry + anger);
+                    }
+                }
+
+                facebookPostServiceList.add(response);
+            });
+
+            log.info("Facebook Posts: size: {}: {}", facebookPostServiceList.size(), facebookPostServiceList);
+
+            Page<FacebookPostResponse> postPages = new Page<>();
+            postPages.setSize(size);
+            postPages.setPage(page);
+            postPages.setObjects(facebookPostServiceList);
+
+            return postPages;
+        } catch (UncategorizedApiException exc) {
+            throw new HttpNotFoundException("Not found page by id: " + pageId);
+        }
     }
 
     @Override
-    public FacebookPostResponse findPostBySystemUserIdAndPostId(UUID systemUserId, String postId) {
+    public FacebookPostResponse addPostToPage(UUID systemUserId, String pageId, FacebookPostRequest request) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        Post post = faService.getConnection(accessGrant).getApi().feedOperations().getPost(postId);
-        FacebookPostResponse response = new FacebookPostResponse();
-        response.setSystemUserId(systemUserId);
-        response.setGroupId(post.getPlace().getId());
-        response.setPostId(postId);
-        response.setMessage(post.getMessage());
-        response.setUserId(post.getAdminCreator().getId());
-        response.setLikesCount(getCountLikes(systemUserId, postId));
-        response.setCommentsCount(getCountComments(systemUserId, postId));
+        try {
+            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            accessGrant = new AccessGrant((String) page.get("access_token"));
 
-        log.info("Facebook Post: {}", response);
+            PostData postData = new PostData(pageId);
+            postData.message(request.getMessage());
 
-        return response;
+            String id = faService.getConnection(accessGrant).getApi().feedOperations().post(postData);
+
+            return getPostByPostIdOfPage(systemUserId, pageId, id);
+        } catch (UncategorizedApiException exc) {
+            throw new HttpNotFoundException("Not found page by id: " + pageId);
+        }
     }
 
-    private Integer getCountLikes(UUID systemUserId, String postId) {
+    @Override
+    public FacebookPostResponse updatePostOfPage(UUID systemUserId, String pageId, String postId, FacebookPostRequest request) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        Integer countLikes = faService.getConnection(accessGrant).getApi().likeOperations().getLikes(postId).size();
+        try {
+            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            accessGrant = new AccessGrant((String) page.get("access_token"));
 
-        log.info("Number of likes (post: {}): {}", postId, countLikes);
-        return countLikes;
+            PostData postData = new PostData(postId);
+            postData.message(request.getMessage());
+
+            String id = faService.getConnection(accessGrant).getApi().feedOperations().post(postData);
+
+            return getPostByPostIdOfPage(systemUserId, pageId, id);
+        } catch (UncategorizedApiException exc) {
+            throw new HttpNotFoundException("Not found page by id: " + pageId);
+        }
     }
 
-    private Integer getCountComments(UUID systemUserId, String postId) {
+    @Override
+    public void deletePostOfPage(UUID systemUserId, String pageId, String postId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        Integer countLikes = faService.getConnection(accessGrant).getApi().commentOperations().getComments(postId).size();
+        try {
+            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            accessGrant = new AccessGrant((String) page.get("access_token"));
 
-        log.info("Number of likes (post: {}): {}", postId, countLikes);
-        return countLikes;
+            faService.getConnection(accessGrant).getApi().feedOperations().deletePost(postId);
+        } catch (UncategorizedApiException exc) {
+            throw new HttpNotFoundException("Not found page by id: " + pageId);
+        }
     }
 }

@@ -20,19 +20,11 @@ public interface FacebookGroupApi {
             "по id пользователя и по id группы")
     FacebookGroupResponse getGroup(UUID systemUserId, String groupId);
 
-    @ApiOperation(value = "Страница пользователя", notes = "Возвращает страницу пользователя " +
-            "по id пользователя и по id страницы")
-    FacebookGroupResponse getPage(UUID systemUserId, String pageId);
-
     @ApiOperation(value = "Изменение группы на выбранную или нет", notes = "Возвращает группу или страницу ")
-    Map<String, Boolean> selectGroupOrPage(UUID systemUserId, String groupOrPageId, FacebookSelectGroupRequest request);
+    Map<String, Boolean> selectGroup(UUID systemUserId, String groupId, FacebookSelectGroupRequest request);
 
     @ApiOperation(value = "Группы пользователя, в которых является админом", notes = "Возвращает группы пользователя " +
             "по id пользователя, в которых он является админом")
     Page<FacebookGroupResponse> getGroups(UUID userId, Integer page, Integer size);
-
-    @ApiOperation(value = "Страницы пользователя", notes = "Возвращает страницы пользователя " +
-            "по id пользователя, в которых он является админом")
-    Page<FacebookGroupResponse> getPages(UUID userId, Integer page, Integer size);
 
 }
