@@ -7,6 +7,7 @@ import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookCommentService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.social.UncategorizedApiException;
 import org.springframework.social.facebook.api.Comment;
 import org.springframework.social.facebook.api.CommentOperations;
@@ -23,6 +24,9 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class FacebookCommentServiceImpl implements FacebookCommentService {
+
+    @Value("${facebook.adapter.id}")
+    private String adapterId;
 
     private FacebookAuthorizationService faService;
     private FacebookAccessGrantService fagService;
@@ -57,6 +61,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setSubCommentsCount(s.getCommentCount());
                 response.setMessage(s.getMessage());
                 response.setCreatedDate(s.getCreatedTime());
+                response.setAdapterId(adapterId);
                 facebookCommentServiceList.add(response);
             });
 
@@ -97,6 +102,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setSubCommentsCount(comment.getCommentCount());
                 response.setMessage(comment.getMessage());
                 response.setCreatedDate(comment.getCreatedTime());
+                response.setAdapterId(adapterId);
 
                 return response;
             } catch (UncategorizedApiException exc) {
@@ -133,6 +139,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setSubCommentsCount(s.getCommentCount());
                 response.setMessage(s.getMessage());
                 response.setCreatedDate(s.getCreatedTime());
+                response.setAdapterId(adapterId);
                 facebookCommentServiceList.add(response);
             });
 
@@ -173,6 +180,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setSubCommentsCount(comment.getCommentCount());
                 response.setMessage(comment.getMessage());
                 response.setCreatedDate(comment.getCreatedTime());
+                response.setAdapterId(adapterId);
 
                 return response;
             } catch (UncategorizedApiException exc) {

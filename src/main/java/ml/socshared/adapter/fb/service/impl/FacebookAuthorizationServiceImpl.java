@@ -43,7 +43,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         OAuth2Parameters params = new OAuth2Parameters();
 
         params.setRedirectUri(redirectUri);
-        params.setScope("email,public_profile,publish_to_groups,groups_access_member_info,publish_pages,manage_pages,user_posts");
+        params.setScope("email,public_profile,publish_to_groups,groups_access_member_info,publish_pages,manage_pages,user_posts,read_insights");
 
         String url = operations.buildAuthenticateUrl(params);
         log.info("URL-redirect: {}", url);

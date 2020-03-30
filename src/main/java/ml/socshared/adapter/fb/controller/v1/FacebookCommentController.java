@@ -27,14 +27,14 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/group/{groupId}/posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookCommentResponse getCommentOfPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                     @PathVariable String postId, @PathVariable String commentId) {
         return commentService.findCommentOfPostByCommentId(systemUserId, groupId, postId, commentId);
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/group/{groupId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<FacebookCommentResponse> getCommentsByPostId(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                              @PathVariable String postId, @RequestParam(value = "page", required = false) Integer page,
                                                              @RequestParam(value = "size", required = false) Integer size) {
@@ -46,7 +46,7 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/group/{groupId}/posts/{postId}/super_comment/{superCommentId}/comments/{commentId}")
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/super_comments/{superCommentId}/comments/{commentId}")
     public FacebookCommentResponse getCommentOfSuperComment(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                             @PathVariable String postId, @PathVariable String superCommentId,
                                                             @PathVariable String commentId) {
@@ -54,15 +54,15 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/group/{groupId}/posts/{postId}/super_comment/{superCommentId}/comments")
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/super_comments/{superCommentId}/comments")
     public Page<FacebookCommentResponse> getCommentsBySuperCommentId(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                                                     @PathVariable String superCommentId, @PathVariable String postId,
+                                                                     @PathVariable String postId, @PathVariable String superCommentId,
                                                                      @RequestParam(value = "page", required = false) Integer page,
                                                                      @RequestParam(value = "size", required = false) Integer size) {
         if (page == null)
             throw new HttpBadRequestException("Error: page parameter not set.");
         if (size == null)
             throw new HttpBadRequestException("Error: size parameter not set.");
-        return commentService.findCommentsOfSuperComment(systemUserId, groupId, superCommentId, postId, page, size);
+        return commentService.findCommentsOfSuperComment(systemUserId, groupId, postId, superCommentId, page, size);
     }
 }
