@@ -13,7 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.util.Collections;
-import java.util.TreeMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -33,7 +33,7 @@ public class GroupBuffer {
     }
 
     @Cacheable(groups)
-    public PagedList<TreeMap> getBufferGroups(UUID systemUserId, Integer countPage) {
+    public PagedList<Map> getBufferGroups(UUID systemUserId, Integer countPage) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
         FacebookAccessGrant userResponse = fagService.findBySystemUserId(systemUserId);
@@ -44,15 +44,15 @@ public class GroupBuffer {
         groupParamMap.put("limit", Collections.singletonList(100 + ""));
         groupParamMap.put("admin_only", Collections.singletonList(Boolean.TRUE.toString()));
 
-        PagedList<TreeMap> groups;
+        PagedList<Map> groups;
         groups = faService.getConnection(accessGrant).getApi()
-                .fetchConnections(userResponse.getFacebookUserId(), "groups", TreeMap.class, groupParamMap);
+                .fetchConnections(userResponse.getFacebookUserId(), "groups", Map.class, groupParamMap);
 
         int i = 0;
         while (groups.getNextPage() != null && i < countPage) {
             groupParamMap.put("after", Collections.singletonList(groups.getNextPage().getAfter()));
             groups = faService.getConnection(accessGrant).getApi()
-                    .fetchConnections(userResponse.getFacebookUserId(), "groups", TreeMap.class, groupParamMap);
+                    .fetchConnections(userResponse.getFacebookUserId(), "groups", Map.class, groupParamMap);
             i++;
         }
 

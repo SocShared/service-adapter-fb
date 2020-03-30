@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -57,12 +57,12 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
 
             try {
-                TreeMap post = faService.getConnection(accessGrant).getApi()
-                        .fetchObject(pageId + "_" + postId, TreeMap.class, "id,message,from{id},created_time,updated_time," +
+                Map post = faService.getConnection(accessGrant).getApi()
+                        .fetchObject(pageId + "_" + postId, Map.class, "id,message,from{id},created_time,updated_time," +
                                 "insights.metric(post_impressions,post_reactions_by_type_total){name,values},comments.summary(1).limit(0){summary},shares");
 
                 if (post == null)
@@ -73,22 +73,23 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                 response.setPostId(((String) post.get("id")).split("_")[1]);
                 response.setMessage((String) post.get("message"));
                 response.setSystemUserId(systemUserId);
-                response.setUserId((String) ((TreeMap) post.get("from")).get("id"));
+                response.setUserId((String) ((Map) post.get("from")).get("id"));
                 response.setCreatedDate(OffsetDateTime.parse((String) post.get("created_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
                 response.setUpdatedDate(OffsetDateTime.parse((String) post.get("updated_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
-                response.setCommentsCount((Integer) ((TreeMap) ((TreeMap) post.get("comments")).get("summary")).get("total_count"));
-                response.setRepostsCount(((TreeMap) post.get("shares")).get("count") == null ? 0 : (Integer) ((TreeMap) post.get("shares")).get("count"));
+                response.setCommentsCount((Integer) ((Map) ((Map) post.get("comments")).get("summary")).get("total_count"));
+                response.setRepostsCount(post.get("shares") == null ? 0 : (Integer) ((Map) post.get("shares")).get("count"));
                 response.setAdapterId(adapterId);
 
-                TreeMap[] insights = (TreeMap[]) ((TreeMap) post.get("insights")).get("data");
-                for (TreeMap ins : insights) {
+                List insights = (List) ((Map) post.get("insights")).get("data");
+                for (Object obj : insights) {
+                    Map ins = (Map) obj;
                     if (ins.get("name").equals("post_impressions")) {
-                        response.setViewsCount((Integer) ((TreeMap[]) ins.get("values"))[0].get("value"));
+                        response.setViewsCount((Integer) ((Map) ((List) ins.get("values")).get(0)).get("value"));
                     }
                     if (ins.get("name").equals("post_reactions_by_type_total")) {
-                        TreeMap reactions = (TreeMap) ((TreeMap[]) ins.get("values"))[0].get("value");
+                        Map reactions = (Map) ((Map) ((List) ins.get("values")).get(0)).get("value");
                         int like = reactions.get("like") == null ? 0 : (Integer) reactions.get("like");
                         int love = reactions.get("love") == null ? 0 : (Integer) reactions.get("love");
                         int wow = reactions.get("wow") == null ? 0 : (Integer) reactions.get("wow");
@@ -117,7 +118,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap pageUser = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            Map pageUser = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) pageUser.get("access_token"));
 
             List<FacebookPostResponse> facebookPostServiceList = new LinkedList<>();
@@ -128,8 +129,8 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             postParamMap.put("limit", Collections.singletonList(size + ""));
             postParamMap.put("offset", Collections.singletonList(page * size + ""));
 
-            PagedList<TreeMap> posts = faService.getConnection(accessGrant).getApi().fetchConnections(pageId,
-                    "posts", TreeMap.class, postParamMap);
+            PagedList<Map> posts = faService.getConnection(accessGrant).getApi().fetchConnections(pageId,
+                    "posts", Map.class, postParamMap);
 
             posts.forEach(s -> {
                 FacebookPostResponse response = new FacebookPostResponse();
@@ -137,22 +138,23 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                 response.setPostId(((String) s.get("id")).split("_")[1]);
                 response.setMessage((String) s.get("message"));
                 response.setSystemUserId(systemUserId);
-                response.setUserId((String) ((TreeMap) s.get("from")).get("id"));
+                response.setUserId((String) ((Map) s.get("from")).get("id"));
                 response.setCreatedDate(OffsetDateTime.parse((String) s.get("created_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
                 response.setUpdatedDate(OffsetDateTime.parse((String) s.get("updated_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
-                response.setCommentsCount((Integer) ((TreeMap) ((TreeMap) s.get("comments")).get("summary")).get("total_count"));
-                response.setRepostsCount(((TreeMap) s.get("shares")).get("count") == null ? 0 : (Integer) ((TreeMap) s.get("shares")).get("count"));
+                response.setCommentsCount((Integer) ((Map) ((Map) s.get("comments")).get("summary")).get("total_count"));
+                response.setRepostsCount(s.get("shares") == null ? 0 : (Integer) ((Map) s.get("shares")).get("count"));
                 response.setAdapterId(adapterId);
 
-                TreeMap[] insights = (TreeMap[]) ((TreeMap) s.get("insights")).get("data");
-                for (TreeMap ins : insights) {
+                List insights = (List) ((Map) s.get("insights")).get("data");
+                for (Object obj : insights) {
+                    Map ins = (Map) obj;
                     if (ins.get("name").equals("post_impressions")) {
-                        response.setViewsCount((Integer) ((TreeMap[]) ins.get("values"))[0].get("value"));
+                        response.setViewsCount((Integer) ((Map) ((List) ins.get("values")).get(0)).get("value"));
                     }
                     if (ins.get("name").equals("post_reactions_by_type_total")) {
-                        TreeMap reactions = (TreeMap) ((TreeMap[]) ins.get("values"))[0].get("value");
+                        Map reactions = (Map) ((Map) ((List) ins.get("values")).get(0)).get("value");
                         int like = reactions.get("like") == null ? 0 : (Integer) reactions.get("like");
                         int love = reactions.get("love") == null ? 0 : (Integer) reactions.get("love");
                         int wow = reactions.get("wow") == null ? 0 : (Integer) reactions.get("wow");
@@ -187,7 +189,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
 
             PostData postData = new PostData(pageId);
@@ -207,7 +209,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
 
             PostData postData = new PostData(postId);
@@ -227,7 +229,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "access_token");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
 
             faService.getConnection(accessGrant).getApi().feedOperations().deletePost(postId);

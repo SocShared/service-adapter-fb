@@ -65,11 +65,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         pageResponse.setHasPrev(false);
         pageResponse.setHasNext(false);
 
-        PagedList<TreeMap> groups = groupBuffer.getBufferGroups(systemUserId, page * size / 100);
+        PagedList<Map> groups = groupBuffer.getBufferGroups(systemUserId, page * size / 100);
 
         int i, j;
         for (i = page * size, j = 0; i < groups.size() && j < size; i++, j++) {
-            TreeMap map = groups.get(i);
+            Map map = groups.get(i);
 
             boolean isSelect = groupRepository.findById((String) map.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
@@ -119,8 +119,8 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         pageParamMap.put("limit", Collections.singletonList(size + ""));
         pageParamMap.put("offset", Collections.singletonList(page * size + ""));
 
-        PagedList<TreeMap> pages = faService.getConnection(accessGrant).getApi()
-                .fetchConnections(userResponse.getFacebookUserId(), "accounts", TreeMap.class, pageParamMap);
+        PagedList<Map> pages = faService.getConnection(accessGrant).getApi()
+                .fetchConnections(userResponse.getFacebookUserId(), "accounts", Map.class, pageParamMap);
 
         pages.forEach(s -> {
             boolean isSelect = groupRepository.findById((String) s.get("id")).orElse(null) != null;
@@ -151,7 +151,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
-        TreeMap group = faService.getConnection(accessGrant).getApi().fetchObject(groupId, TreeMap.class,
+        Map group = faService.getConnection(accessGrant).getApi().fetchObject(groupId, Map.class,
                 "id", "name", "member_count", "created_time", "updated_time");
 
         if (group.get("member_count") == null)
@@ -178,7 +178,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class,
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class,
                     "id", "name", "talking_about_count");
 
             boolean isSelect = groupRepository.findById((String) page.get("id")).orElse(null) != null;
@@ -206,7 +206,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            TreeMap page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, TreeMap.class, "id", "talking_about_count");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "id", "talking_about_count");
 
             if (page != null && page.get("talking_about_count") != null) {
                 FacebookAdminClientGroup p = new FacebookAdminClientGroup();

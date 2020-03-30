@@ -31,29 +31,36 @@ public class FacebookPostController implements FacebookPostApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupOrPageId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<FacebookPostResponse> getPosts(@PathVariable UUID systemUserId, @PathVariable String groupOrPageId,
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Page<FacebookPostResponse> getPosts(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                @RequestParam(name = "page", required = false) Integer page,
                                                @RequestParam(name = "size", required = false) Integer size) {
         if (page == null)
             throw new HttpBadRequestException("Error: page parameter not set.");
         if (size == null)
             throw new HttpBadRequestException("Error: size parameter not set.");
-        return postService.getPostsByPageId(systemUserId, groupOrPageId, page, size);
+        return postService.getPostsByPageId(systemUserId, groupId, page, size);
     }
 
     @Override
-    public FacebookPostResponse addPost(UUID systemUserId, String groupId, FacebookPostRequest request) {
+    @PostMapping(value = "/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookPostResponse addPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
+                                        @RequestBody FacebookPostRequest request) {
         return postService.addPostToPage(systemUserId, groupId, request);
     }
 
     @Override
-    public FacebookPostResponse updatePost(UUID systemUserId, String groupId, String postId, FacebookPostRequest request) {
+    @PatchMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookPostResponse updatePost(@PathVariable UUID systemUserId, @PathVariable String groupId,
+                                           @PathVariable String postId, @RequestBody FacebookPostRequest request) {
         return postService.updatePostOfPage(systemUserId, groupId, postId, request);
     }
 
     @Override
-    public void deletePost(UUID systemUserId, String groupId, String postId) {
+    @DeleteMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}")
+    public void deletePost(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId) {
         postService.deletePostOfPage(systemUserId, groupId, postId);
     }
 }

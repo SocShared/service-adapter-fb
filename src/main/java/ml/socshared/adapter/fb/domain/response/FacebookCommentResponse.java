@@ -25,6 +25,5 @@ public class FacebookCommentResponse {
     private Integer likeCount;
     private Integer subCommentsCount;
     private Date createdDate;
-    private Date updatedDate;
 
 }
