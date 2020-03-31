@@ -15,7 +15,10 @@ import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.facebook.api.PagingParameters;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +50,13 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
             List<FacebookCommentResponse> facebookCommentServiceList = new LinkedList<>();
 
-            PagedList<Comment> comments = faService.getConnection(grant).getApi().commentOperations()
-                    .getComments(pageId + "_" + postId, new PagingParameters(size, size * page, null, null));
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.put("fields", Collections.singletonList("id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from"));
+            map.put("limit", Collections.singletonList(size.toString()));
+            map.put("offset", Collections.singletonList(page * size + ""));
+
+            PagedList<Comment> comments = faService.getConnection(grant).getApi().fetchConnections(pageId + "_" + postId, "comments",
+                    Comment.class, map);
 
             comments.forEach(s -> {
                 FacebookCommentResponse response = new FacebookCommentResponse();
@@ -89,8 +97,8 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
             grant = new AccessGrant((String) faService.getConnection(grant).getApi().fetchObject(pageId, Map.class, "access_token").get("access_token"));
 
             try {
-                Comment comment = faService.getConnection(grant).getApi().commentOperations()
-                        .getComment(postId + "_" + commentId);
+                Comment comment = faService.getConnection(grant).getApi().fetchObject(postId + "_" + commentId, Comment.class,
+                        "id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from");
 
                 FacebookCommentResponse response = new FacebookCommentResponse();
                 response.setSystemUserId(systemUserId);
@@ -124,8 +132,13 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
             List<FacebookCommentResponse> facebookCommentServiceList = new LinkedList<>();
 
-            PagedList<Comment> comments = faService.getConnection(grant).getApi().commentOperations()
-                    .getComments(postId + "_" + superCommentId, new PagingParameters(size, size * page, null, null));
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.put("fields", Collections.singletonList("id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from"));
+            map.put("limit", Collections.singletonList(size.toString()));
+            map.put("offset", Collections.singletonList(page * size + ""));
+
+            PagedList<Comment> comments = faService.getConnection(grant).getApi().fetchConnections(postId + "_" + superCommentId, "comments",
+                    Comment.class, map);
 
             comments.forEach(s -> {
                 FacebookCommentResponse response = new FacebookCommentResponse();
@@ -167,7 +180,8 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
             grant = new AccessGrant((String) faService.getConnection(grant).getApi().fetchObject(pageId, Map.class, "access_token").get("access_token"));
 
             try {
-                Comment comment = faService.getConnection(grant).getApi().commentOperations().getComment(superCommentId + "_" + commentId);
+                Comment comment = faService.getConnection(grant).getApi().fetchObject(postId + "_" + commentId, Comment.class,
+                        "id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from");
 
                 FacebookCommentResponse response = new FacebookCommentResponse();
                 response.setSystemUserId(systemUserId);
