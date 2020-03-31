@@ -36,26 +36,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     /**
-     * Registers the KeycloakAuthenticationProvider with the authentication manager.
-     */
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
-        auth.authenticationProvider(keycloakAuthenticationProvider);
-    }
-
-    /**
-     * Provide a session authentication strategy bean which should be of type
-     * RegisterSessionAuthenticationStrategy for public or confidential applications
-     * and NullAuthenticatedSessionStrategy for bearer-only applications.
-     */
-    @Bean
-    @Override
-    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
-    }
-
-    /**
      * Use properties in application.properties instead of keycloak.json
      */
     @Bean
@@ -64,15 +44,89 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         return new CustomKeycloakSpringBootConfigResolver(properties);
     }
 
+    @Bean
+    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
+        mapper.setConvertToUpperCase(true);
+        return mapper;
+    }
+
+    /**
+     * Registers the KeycloakAuthenticationProvider with the authentication manager.
+     */
+    @Override
+    protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
+        final KeycloakAuthenticationProvider provider = super.keycloakAuthenticationProvider();
+        provider.setGrantedAuthoritiesMapper(grantedAuthoritiesMapper());
+        return provider;
+    }
+
+    /**
+     * Registers the KeycloakAuthenticationProvider with the authentication manager.
+     */
+    @Override
+    protected void configure(final AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(keycloakAuthenticationProvider());
+    }
+
+    /**
+     * Defines the session authentication strategy.
+     */
+    @Bean
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new NullAuthenticatedSessionStrategy();
+    }
+
     /**
      * Secure appropriate endpoints
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.authorizeRequests()
-                .antMatchers("/**").authenticated()
+        log.info("Run DEFAULT Security Configuration");
+        http
+                .authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/v2/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
+                .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
+                .antMatchers("/swaggger-resources/**").permitAll()
                 .antMatchers("/error").permitAll()
+                .antMatchers("/**").authenticated()
                 .anyRequest().authenticated();
+    }
+
+    @Bean
+    public FilterRegistrationBean keycloakAuthenticationProcessingFilterRegistrationBean(
+            final KeycloakAuthenticationProcessingFilter filter) {
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+        registrationBean.setEnabled(false);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
+            final KeycloakPreAuthActionsFilter filter) {
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+        registrationBean.setEnabled(false);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean keycloakAuthenticatedActionsFilterBean(
+            KeycloakAuthenticatedActionsFilter filter) {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+        registrationBean.setEnabled(false);
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean keycloakSecurityContextRequestFilterBean(
+            KeycloakSecurityContextRequestFilter filter) {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+        registrationBean.setEnabled(false);
+        return registrationBean;
     }
 }
