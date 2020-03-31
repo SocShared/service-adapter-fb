@@ -35,6 +35,8 @@ services:
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
+      KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml/auth
+      KEYCLOAK_HOSTNAME: keycloak.socshared.ml
     ports:
       - 8080:8080
 
