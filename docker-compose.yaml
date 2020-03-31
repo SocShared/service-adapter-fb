@@ -27,6 +27,8 @@ services:
 
   zipkin:
     image: openzipkin/zipkin:2
+    deploy:
+      replicas: 1
     ports:
       - 9411:9411
 
@@ -35,8 +37,10 @@ services:
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
-      KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml/auth
-      KEYCLOAK_HOSTNAME: keycloak.socshared.ml
+      KEYCLOAK_FRONTEND_URL: http://10.166.0.19/auth
+      KEYCLOAK_HOSTNAME: 10.166.0.19
+    deploy:
+      replicas: 1
     ports:
       - 8080:8080
 
