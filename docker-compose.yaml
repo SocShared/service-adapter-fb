@@ -37,11 +37,12 @@ services:
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
-      KEYCLOAK_HOSTNAME: keycloak.socshared.ml
+      KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml
+      KEYCLOAK_HOSTNAME: keyclock.socshared.ml
     deploy:
       replicas: 1
     ports:
-      - 8080:8080
+      - 9999:8080
 
 secrets:
   postgres_password:
