@@ -63,10 +63,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             try {
                 Map post = faService.getConnection(accessGrant).getApi()
                         .fetchObject(pageId + "_" + postId, Map.class, "id,message,from{id},created_time,updated_time," +
-                                "insights.metric(post_impressions,post_reactions_by_type_total){name,values},comments.summary(1).limit(0){summary},shares");
-
-                if (post == null)
-                    throw new HttpNotFoundException("Not found post by id: " + postId);
+                                "insights.metric(post_impressions){name,values},likes.summary(1).limit(0){summary},comments.summary(1).limit(0){summary},shares");
 
                 FacebookPostResponse response = new FacebookPostResponse();
                 response.setGroupId(pageId);
@@ -79,6 +76,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                 response.setUpdatedDate(OffsetDateTime.parse((String) post.get("updated_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
                 response.setCommentsCount((Integer) ((Map) ((Map) post.get("comments")).get("summary")).get("total_count"));
+                response.setLikesCount((Integer) ((Map) ((Map) post.get("likes")).get("summary")).get("total_count"));
                 response.setRepostsCount(post.get("shares") == null ? 0 : (Integer) ((Map) post.get("shares")).get("count"));
                 response.setAdapterId(adapterId);
 
@@ -87,18 +85,6 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                     Map ins = (Map) obj;
                     if (ins.get("name").equals("post_impressions")) {
                         response.setViewsCount((Integer) ((Map) ((List) ins.get("values")).get(0)).get("value"));
-                    }
-                    if (ins.get("name").equals("post_reactions_by_type_total")) {
-                        Map reactions = (Map) ((Map) ((List) ins.get("values")).get(0)).get("value");
-                        int like = reactions.get("like") == null ? 0 : (Integer) reactions.get("like");
-                        int love = reactions.get("love") == null ? 0 : (Integer) reactions.get("love");
-                        int wow = reactions.get("wow") == null ? 0 : (Integer) reactions.get("wow");
-                        int haha = reactions.get("haha") == null ? 0 : (Integer) reactions.get("haha");
-                        int sorry = reactions.get("sorry") == null ? 0 : (Integer) reactions.get("sorry");
-                        int anger = reactions.get("anger") == null ? 0 : (Integer) reactions.get("anger");
-
-                        response.setLikesCount(like + love + wow);
-                        response.setDislikesCount(haha + sorry + anger);
                     }
                 }
 
@@ -125,7 +111,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
 
             MultiValueMap<String, String> postParamMap = new LinkedMultiValueMap<>();
             postParamMap.put("fields", Collections.singletonList("id,message,from{id},created_time,updated_time," +
-                    "insights.metric(post_impressions,post_reactions_by_type_total){name,values},comments.summary(1).limit(0){summary},shares"));
+                    "insights.metric(post_impressions){name,values},likes.summary(1).limit(0){summary},comments.summary(1).limit(0){summary},shares"));
             postParamMap.put("limit", Collections.singletonList(size + ""));
             postParamMap.put("offset", Collections.singletonList(page * size + ""));
 
@@ -144,6 +130,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                 response.setUpdatedDate(OffsetDateTime.parse((String) s.get("updated_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
                 response.setCommentsCount((Integer) ((Map) ((Map) s.get("comments")).get("summary")).get("total_count"));
+                response.setLikesCount((Integer) ((Map) ((Map) s.get("likes")).get("summary")).get("total_count"));
                 response.setRepostsCount(s.get("shares") == null ? 0 : (Integer) ((Map) s.get("shares")).get("count"));
                 response.setAdapterId(adapterId);
 
@@ -152,18 +139,6 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                     Map ins = (Map) obj;
                     if (ins.get("name").equals("post_impressions")) {
                         response.setViewsCount((Integer) ((Map) ((List) ins.get("values")).get(0)).get("value"));
-                    }
-                    if (ins.get("name").equals("post_reactions_by_type_total")) {
-                        Map reactions = (Map) ((Map) ((List) ins.get("values")).get(0)).get("value");
-                        int like = reactions.get("like") == null ? 0 : (Integer) reactions.get("like");
-                        int love = reactions.get("love") == null ? 0 : (Integer) reactions.get("love");
-                        int wow = reactions.get("wow") == null ? 0 : (Integer) reactions.get("wow");
-                        int haha = reactions.get("haha") == null ? 0 : (Integer) reactions.get("haha");
-                        int sorry = reactions.get("sorry") == null ? 0 : (Integer) reactions.get("sorry");
-                        int anger = reactions.get("anger") == null ? 0 : (Integer) reactions.get("anger");
-
-                        response.setLikesCount(like + love + wow);
-                        response.setDislikesCount(haha + sorry + anger);
                     }
                 }
 
