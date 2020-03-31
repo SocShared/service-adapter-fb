@@ -11,6 +11,7 @@ import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticatedActionsF
 import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
 import org.keycloak.adapters.springsecurity.filter.KeycloakSecurityContextRequestFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -20,7 +21,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 @KeycloakConfiguration
@@ -32,84 +35,44 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 @Slf4j
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
-    @Bean
-    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
-        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
-        mapper.setConvertToUpperCase(true);
-        return mapper;
-    }
-
     /**
      * Registers the KeycloakAuthenticationProvider with the authentication manager.
      */
-    @Override
-    protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
-        final KeycloakAuthenticationProvider provider = super.keycloakAuthenticationProvider();
-        provider.setGrantedAuthoritiesMapper(grantedAuthoritiesMapper());
-        return provider;
-    }
-
-    @Override
-    protected void configure(final AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(keycloakAuthenticationProvider());
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+        auth.authenticationProvider(keycloakAuthenticationProvider);
     }
 
     /**
-     * Defines the session authentication strategy.
+     * Provide a session authentication strategy bean which should be of type
+     * RegisterSessionAuthenticationStrategy for public or confidential applications
+     * and NullAuthenticatedSessionStrategy for bearer-only applications.
      */
     @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new NullAuthenticatedSessionStrategy();
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
 
+    /**
+     * Use properties in application.properties instead of keycloak.json
+     */
+    @Bean
+    @Primary
+    public KeycloakConfigResolver keycloakConfigResolver(KeycloakSpringBootProperties properties) {
+        return new CustomKeycloakSpringBootConfigResolver(properties);
+    }
+
+    /**
+     * Secure appropriate endpoints
+     */
     @Override
-    protected void configure(HttpSecurity http) throws Exception
-    {
+    protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        log.info("Run DEV/PROD Security Configuration");
-        http
-                .authorizeRequests()
-                .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/swagger-ui.html").permitAll()
-                .antMatchers("/v2/api-docs/**").permitAll()
-                .antMatchers("/swagger-ui/**").permitAll()
-                .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
-                .antMatchers("/swaggger-resources/**").permitAll()
-                .antMatchers("/error").permitAll()
+        http.authorizeRequests()
                 .antMatchers("/**").authenticated()
+                .antMatchers("/error").permitAll()
                 .anyRequest().authenticated();
-    }
-
-    @Bean
-    public FilterRegistrationBean keycloakAuthenticationProcessingFilterRegistrationBean(
-            final KeycloakAuthenticationProcessingFilter filter) {
-        final FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
-
-    @Bean
-    public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
-            final KeycloakPreAuthActionsFilter filter) {
-        final FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
-
-    @Bean
-    public FilterRegistrationBean keycloakAuthenticatedActionsFilterBean(
-            KeycloakAuthenticatedActionsFilter filter) {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
-
-    @Bean
-    public FilterRegistrationBean keycloakSecurityContextRequestFilterBean(
-            KeycloakSecurityContextRequestFilter filter) {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
     }
 }
