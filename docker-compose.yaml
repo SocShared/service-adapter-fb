@@ -37,7 +37,7 @@ services:
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
-      KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml
+      KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml/auth
     deploy:
       replicas: 1
     ports:
