@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/v1")
@@ -12,13 +15,13 @@ public class SecuredController {
 
     @GetMapping("/content_manager")
     @PreAuthorize("hasAuthority('CONTENT_MANAGER')")
-    public String operator() {
-        return "Operator";
+    public Map operator() {
+        return new HashMap() {{ put("role", "content_manager");}};
     }
 
     @GetMapping("/admin")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public String admin() {
-        return "Admin";
+    public Map admin() {
+        return new HashMap() {{ put("role", "admin");}};
     }
 }

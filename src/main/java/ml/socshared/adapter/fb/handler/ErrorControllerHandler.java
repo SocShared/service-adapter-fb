@@ -13,7 +13,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+/*@RestController
 public class ErrorControllerHandler implements ErrorController {
 
     private static final String PATH = "/error";
@@ -23,7 +23,7 @@ public class ErrorControllerHandler implements ErrorController {
     public Map<String, Object> error() {
         return new HashMap<>() {
             {
-                put("status", 404);
+                put("status",);
                 put("error", HttpStatus.NOT_FOUND);
             }
         };
@@ -33,4 +33,4 @@ public class ErrorControllerHandler implements ErrorController {
     public String getErrorPath() {
         return PATH;
     }
-}
+}*/
