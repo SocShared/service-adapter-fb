@@ -17,3 +17,4 @@ cache:
   groups: groups
   posts: posts
   comments: comments
+  super_comments: super_comments

@@ -9,6 +9,7 @@ import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookCommentService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.UncategorizedApiException;
 import org.springframework.social.facebook.api.Comment;
 import org.springframework.social.facebook.api.CommentOperations;
@@ -31,6 +32,10 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
     @Value("${facebook.adapter.id}")
     private String adapterId;
+    @Value("${cache.comments}")
+    private final String comments = "comments";
+    @Value("${cache.super_comments}")
+    private final String superComments = "super_comments";
 
     private FacebookAuthorizationService faService;
     private FacebookAccessGrantService fagService;
@@ -42,6 +47,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
+    @Cacheable(comments)
     public Page<FacebookCommentResponse> findCommentsOfPost(String systemUserId, String pageId, String postId, Integer page, Integer size) {
         if (page < 0)
             throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
@@ -130,6 +136,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
+    @Cacheable(superComments)
     public Page<FacebookCommentResponse> findCommentsOfSuperComment(String systemUserId, String pageId, String postId,
                                                                     String superCommentId, Integer page, Integer size) {
         if (page < 0)

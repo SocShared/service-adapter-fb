@@ -22,7 +22,10 @@ public class CacheConfig {
     @Value("${cache.comments}")
     private final String comments = "comments";
 
-    @CacheEvict(allEntries = true, cacheNames = {pages, groups, posts, comments})
+    @Value("${cache.super_comments}")
+    private final String superComments = "super_comments";
+
+    @CacheEvict(allEntries = true, cacheNames = {pages, groups, posts, comments, superComments})
     @Scheduled(fixedDelay = 30000)
     public void cacheEvict () {
     }
