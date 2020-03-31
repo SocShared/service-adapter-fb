@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Profile;
  * @author Nikita_Mikaev
  */
 @Configuration
-@ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 @Profile({Constants.DEV_PROFILE, Constants.PROD_PROFILE})
 public class CustomKeycloakSpringBootConfigResolver extends KeycloakSpringBootConfigResolver {
 
