@@ -35,11 +35,12 @@ services:
   keycloak:
     container_name: keycloak
     image: jboss/keycloak
+    command: -Djboss.http.port=9999
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
     ports:
-      - 8080:8080
+      - 9999:9999
 
 secrets:
   postgres_password:
