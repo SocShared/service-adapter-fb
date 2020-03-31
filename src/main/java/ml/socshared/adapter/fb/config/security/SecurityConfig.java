@@ -76,6 +76,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/webjars/springfox-swagger-ui/**").permitAll()
                 .antMatchers("/swaggger-resources/**").permitAll()
+                .antMatchers("/error").permitAll()
                 .antMatchers("/**").authenticated()
                 .anyRequest().authenticated();
     }
