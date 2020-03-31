@@ -38,7 +38,6 @@ services:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
       KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml
-      KEYCLOAK_HOSTNAME: keyclock.socshared.ml
     deploy:
       replicas: 1
     ports:
