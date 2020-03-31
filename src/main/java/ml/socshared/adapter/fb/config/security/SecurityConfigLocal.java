@@ -11,7 +11,7 @@ import static ml.socshared.adapter.fb.config.Constants.*;
 
 @Configuration
 @EnableWebSecurity
-@Profile({TEST_PROFILE, LOCAL_PROFILE, DEV_PROFILE})
+@Profile({TEST_PROFILE, LOCAL_PROFILE})
 @Slf4j
 public class SecurityConfigLocal extends WebSecurityConfigurerAdapter {
 
