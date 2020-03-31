@@ -3,6 +3,7 @@ package ml.socshared.adapter.fb.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookCommentResponse;
+import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
@@ -41,7 +42,14 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
-    public Page<FacebookCommentResponse> findCommentsOfPost(UUID systemUserId, String pageId, String postId, Integer page, Integer size) {
+    public Page<FacebookCommentResponse> findCommentsOfPost(String systemUserId, String pageId, String postId, Integer page, Integer size) {
+        if (page < 0)
+            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
+        if (size < 0)
+            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
+        if (size > 100)
+            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
+
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", grant.getAccessToken());
 
@@ -60,7 +68,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
             comments.forEach(s -> {
                 FacebookCommentResponse response = new FacebookCommentResponse();
-                response.setSystemUserId(systemUserId);
+                response.setSystemUserId(UUID.fromString(systemUserId));
                 response.setGroupId(pageId);
                 response.setPostId(postId);
                 response.setCommentId(s.getId().split("_")[1]);
@@ -89,7 +97,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
-    public FacebookCommentResponse findCommentOfPostByCommentId(UUID systemUserId, String pageId, String postId, String commentId) {
+    public FacebookCommentResponse findCommentOfPostByCommentId(String systemUserId, String pageId, String postId, String commentId) {
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", grant.getAccessToken());
 
@@ -101,7 +109,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                         "id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from");
 
                 FacebookCommentResponse response = new FacebookCommentResponse();
-                response.setSystemUserId(systemUserId);
+                response.setSystemUserId(UUID.fromString(systemUserId));
                 response.setGroupId(pageId);
                 response.setPostId(postId);
                 response.setCommentId(comment.getId().split("_")[1]);
@@ -122,8 +130,15 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
-    public Page<FacebookCommentResponse> findCommentsOfSuperComment(UUID systemUserId, String pageId, String postId,
+    public Page<FacebookCommentResponse> findCommentsOfSuperComment(String systemUserId, String pageId, String postId,
                                                                     String superCommentId, Integer page, Integer size) {
+        if (page < 0)
+            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
+        if (size < 0)
+            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
+        if (size > 100)
+            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
+
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", grant.getAccessToken());
 
@@ -142,7 +157,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
             comments.forEach(s -> {
                 FacebookCommentResponse response = new FacebookCommentResponse();
-                response.setSystemUserId(systemUserId);
+                response.setSystemUserId(UUID.fromString(systemUserId));
                 response.setGroupId(pageId);
                 response.setPostId(postId);
                 response.setSuperCommentId(superCommentId);
@@ -172,7 +187,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
-    public FacebookCommentResponse findCommentOfSuperCommentByCommentId(UUID systemUserId, String pageId, String postId, String superCommentId, String commentId) {
+    public FacebookCommentResponse findCommentOfSuperCommentByCommentId(String systemUserId, String pageId, String postId, String superCommentId, String commentId) {
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", grant.getAccessToken());
 
@@ -184,7 +199,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                         "id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from");
 
                 FacebookCommentResponse response = new FacebookCommentResponse();
-                response.setSystemUserId(systemUserId);
+                response.setSystemUserId(UUID.fromString(systemUserId));
                 response.setGroupId(pageId);
                 response.setPostId(postId);
                 response.setSuperCommentId(superCommentId);

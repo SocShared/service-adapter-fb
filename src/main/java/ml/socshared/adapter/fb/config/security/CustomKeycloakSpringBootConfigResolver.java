@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile({Constants.DEV_PROFILE, Constants.PROD_PROFILE})
+@Profile({Constants.DEV_PROFILE, Constants.PROD_PROFILE, Constants.LOCAL_PROFILE})
 @EnableConfigurationProperties(KeycloakSpringBootProperties.class)
 public class CustomKeycloakSpringBootConfigResolver extends KeycloakSpringBootConfigResolver {
     private final KeycloakDeployment keycloakDeployment;

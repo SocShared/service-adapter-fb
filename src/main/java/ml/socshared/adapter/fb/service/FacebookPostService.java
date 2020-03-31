@@ -11,10 +11,10 @@ import java.util.UUID;
 
 public interface FacebookPostService {
 
-    FacebookPostResponse getPostByPostIdOfPage(UUID systemUserId, String pageId, String postId);
-    Page<FacebookPostResponse> getPostsByPageId(UUID systemUserId, String pageId, Integer page, Integer size);
-    FacebookPostResponse addPostToPage(UUID systemUserId, String pageId, FacebookPostRequest request);
-    FacebookPostResponse updatePostOfPage(UUID systemUserId, String pageId, String postId, FacebookPostRequest request);
-    void deletePostOfPage(UUID systemUserId, String pageId, String postId);
+    FacebookPostResponse getPostByPostIdOfPage(String systemUserId, String pageId, String postId);
+    Page<FacebookPostResponse> getPostsByPageId(String systemUserId, String pageId, Integer page, Integer size);
+    FacebookPostResponse addPostToPage(String systemUserId, String pageId, FacebookPostRequest request);
+    FacebookPostResponse updatePostOfPage(String systemUserId, String pageId, String postId, FacebookPostRequest request);
+    void deletePostOfPage(String systemUserId, String pageId, String postId);
 
 }

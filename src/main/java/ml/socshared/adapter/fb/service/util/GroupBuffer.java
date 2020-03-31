@@ -33,7 +33,7 @@ public class GroupBuffer {
     }
 
     @Cacheable(groups)
-    public PagedList<Map> getBufferGroups(UUID systemUserId, Integer countPage) {
+    public PagedList<Map> getBufferGroups(String systemUserId, Integer countPage) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
         FacebookAccessGrant userResponse = fagService.findBySystemUserId(systemUserId);

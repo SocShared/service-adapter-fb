@@ -4,7 +4,7 @@ spring:
   application:
     name: socshared-adapter-fb
   profiles:
-    active: ${SPRING_PROFILE:dev}
+    active: ${SPRING_PROFILE:local}
   social:
     facebook:
       appId: 226788808719091

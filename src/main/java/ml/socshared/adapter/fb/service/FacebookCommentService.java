@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public interface FacebookCommentService {
 
-    Page<FacebookCommentResponse> findCommentsOfPost(UUID systemUserId, String pageId, String postId, Integer page, Integer size);
-    FacebookCommentResponse findCommentOfPostByCommentId(UUID systemUserId, String pageId, String postId, String commentId);
-    Page<FacebookCommentResponse> findCommentsOfSuperComment(UUID systemUserId, String pageId, String postId, String superCommentId, Integer page, Integer size);
-    FacebookCommentResponse findCommentOfSuperCommentByCommentId(UUID systemUserId, String pageId, String postId, String superCommentId, String commentId);
+    Page<FacebookCommentResponse> findCommentsOfPost(String systemUserId, String pageId, String postId, Integer page, Integer size);
+    FacebookCommentResponse findCommentOfPostByCommentId(String systemUserId, String pageId, String postId, String commentId);
+    Page<FacebookCommentResponse> findCommentsOfSuperComment(String systemUserId, String pageId, String postId, String superCommentId, Integer page, Integer size);
+    FacebookCommentResponse findCommentOfSuperCommentByCommentId(String systemUserId, String pageId, String postId, String superCommentId, String commentId);
 
 }

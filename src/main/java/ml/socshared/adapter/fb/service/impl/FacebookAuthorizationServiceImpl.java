@@ -52,7 +52,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse getToken(UUID systemUserId, String authorizationCode) {
+    public FacebookUserResponse getToken(String systemUserId, String authorizationCode) {
         AccessGrant grant = factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
         saveToken(systemUserId, grant);
@@ -61,10 +61,10 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         return findUserDataBySystemUserId(systemUserId);
     }
 
-    private void saveToken(UUID systemUserId, AccessGrant grant) {
+    private void saveToken(String systemUserId, AccessGrant grant) {
         User user = getConnection(grant).getApi().fetchObject("me", User.class, "id");
         FacebookAccessGrant fbAccessGrant = new FacebookAccessGrant();
-        fbAccessGrant.setSystemUserId(systemUserId);
+        fbAccessGrant.setSystemUserId(UUID.fromString(systemUserId));
         fbAccessGrant.setFacebookUserId(user.getId());
         fbAccessGrant.setAccessToken(grant.getAccessToken());
         fbAccessGrant.setExpireTime(grant.getExpireTime());
@@ -85,7 +85,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId) {
+    public FacebookUserResponse findUserDataBySystemUserId(String systemUserId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
         User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
@@ -95,7 +95,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         response.setEmail(user.getEmail());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
-        response.setSystemUserId(systemUserId);
+        response.setSystemUserId(UUID.fromString(systemUserId));
         response.setUserId(user.getId());
         log.info("Facebook User Response: {}", response);
         return response;

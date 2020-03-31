@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookCommentResponse;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 
 import java.util.UUID;
 
@@ -11,15 +12,15 @@ import java.util.UUID;
 public interface FacebookCommentApi {
 
     @ApiOperation(value = "Комментарий поста группы пользователя", notes = "Возвращает определенный комментарий по id")
-    FacebookCommentResponse getCommentOfPost(UUID systemUserId, String groupId, String postId, String commentId);
+    FacebookCommentResponse getCommentOfPost(String groupId, String postId, String commentId, KeycloakAuthenticationToken token);
 
     @ApiOperation(value = "Комменатрии поста группы пользователя", notes = "Возвращает комментарии определенного поста")
-    Page<FacebookCommentResponse> getCommentsByPostId(UUID systemUserId, String groupId, String postId, Integer page, Integer size);
+    Page<FacebookCommentResponse> getCommentsByPostId(String groupId, String postId, Integer page, Integer size, KeycloakAuthenticationToken token);
 
     @ApiOperation(value = "Комментарий суперкомментария поста группы пользователя", notes = "Возвращает определенный комментарий по id")
-    FacebookCommentResponse getCommentOfSuperComment(UUID systemUserId, String groupId, String postId, String superCommentId, String commentId);
+    FacebookCommentResponse getCommentOfSuperComment(String groupId, String postId, String superCommentId, String commentId, KeycloakAuthenticationToken token);
 
     @ApiOperation(value = "Комменатрии суперкомментария поста группы пользователя", notes = "Возвращает комментарии определенного суперкомментария")
-    Page<FacebookCommentResponse> getCommentsBySuperCommentId(UUID systemUserId, String groupId, String postId, String superCommentId, Integer page, Integer size);
+    Page<FacebookCommentResponse> getCommentsBySuperCommentId(String groupId, String postId, String superCommentId, Integer page, Integer size, KeycloakAuthenticationToken token);
 
 }

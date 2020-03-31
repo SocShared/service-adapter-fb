@@ -7,8 +7,8 @@ import java.util.UUID;
 public interface FacebookAccessGrantService {
 
     Page<FacebookAccessGrant> findAll(Integer page, Integer size);
-    FacebookAccessGrant findBySystemUserId(UUID systemUserId);
+    FacebookAccessGrant findBySystemUserId(String systemUserId);
     FacebookAccessGrant save(FacebookAccessGrant accessGrant);
-    void deleteBySystemUserId(UUID systemUserId);
+    void deleteBySystemUserId(String systemUserId);
 
 }

@@ -6,6 +6,8 @@ import ml.socshared.adapter.fb.domain.request.FacebookPostRequest;
 import ml.socshared.adapter.fb.domain.response.FacebookPostResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookPostService;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.http.MediaType;
 import org.springframework.social.facebook.api.PagedList;
 import org.springframework.social.facebook.api.Post;
@@ -26,41 +28,53 @@ public class FacebookPostController implements FacebookPostApi {
     }
 
     @Override
-    public FacebookPostResponse getPost(UUID systemUserId, String groupId, String postId) {
+    @GetMapping(value = "/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookPostResponse getPost(@PathVariable String groupId, @PathVariable String postId,
+                                        KeycloakAuthenticationToken token) {
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         return postService.getPostByPostIdOfPage(systemUserId, groupId, postId);
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Page<FacebookPostResponse> getPosts(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                               @RequestParam(name = "page", required = false) Integer page,
-                                               @RequestParam(name = "size", required = false) Integer size) {
+    @GetMapping(value = "/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Page<FacebookPostResponse> getPosts(@PathVariable String groupId, @RequestParam(name = "page", required = false) Integer page,
+                                               @RequestParam(name = "size", required = false) Integer size, KeycloakAuthenticationToken token) {
         if (page == null)
             throw new HttpBadRequestException("Error: page parameter not set.");
         if (size == null)
             throw new HttpBadRequestException("Error: size parameter not set.");
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         return postService.getPostsByPageId(systemUserId, groupId, page, size);
     }
 
     @Override
-    @PostMapping(value = "/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookPostResponse addPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                        @RequestBody FacebookPostRequest request) {
+    public FacebookPostResponse addPost(@PathVariable String groupId, @RequestBody FacebookPostRequest request,
+                                        KeycloakAuthenticationToken token) {
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         return postService.addPostToPage(systemUserId, groupId, request);
     }
 
     @Override
-    @PatchMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PatchMapping(value = "/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookPostResponse updatePost(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                           @PathVariable String postId, @RequestBody FacebookPostRequest request) {
+    public FacebookPostResponse updatePost(@PathVariable String groupId, @PathVariable String postId,
+                                           @RequestBody FacebookPostRequest request, KeycloakAuthenticationToken token) {
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         return postService.updatePostOfPage(systemUserId, groupId, postId, request);
     }
 
     @Override
-    @DeleteMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}")
-    public void deletePost(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId) {
+    @DeleteMapping(value = "/groups/{groupId}/posts/{postId}")
+    public void deletePost(@PathVariable String groupId, @PathVariable String postId,
+                           KeycloakAuthenticationToken token) {
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         postService.deletePostOfPage(systemUserId, groupId, postId);
     }
 }

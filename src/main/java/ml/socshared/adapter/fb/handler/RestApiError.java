@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.handler;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
         value = "RestApiError",
         description = "An object that stores error information"
 )
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RestApiError {
     private Integer status;
     private HttpStatus error;

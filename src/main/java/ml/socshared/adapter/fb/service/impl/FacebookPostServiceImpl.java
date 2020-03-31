@@ -52,7 +52,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public FacebookPostResponse getPostByPostIdOfPage(UUID systemUserId, String pageId, String postId) {
+    public FacebookPostResponse getPostByPostIdOfPage(String systemUserId, String pageId, String postId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -69,7 +69,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                 response.setGroupId(pageId);
                 response.setPostId(((String) post.get("id")).split("_")[1]);
                 response.setMessage((String) post.get("message"));
-                response.setSystemUserId(systemUserId);
+                response.setSystemUserId(UUID.fromString(systemUserId));
                 response.setUserId((String) ((Map) post.get("from")).get("id"));
                 response.setCreatedDate(OffsetDateTime.parse((String) post.get("created_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
@@ -99,7 +99,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
 
     @Override
     @Cacheable(posts)
-    public Page<FacebookPostResponse> getPostsByPageId(UUID systemUserId, String pageId, Integer page, Integer size) {
+    public Page<FacebookPostResponse> getPostsByPageId(String systemUserId, String pageId, Integer page, Integer size) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -123,7 +123,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                 response.setGroupId(pageId);
                 response.setPostId(((String) s.get("id")).split("_")[1]);
                 response.setMessage((String) s.get("message"));
-                response.setSystemUserId(systemUserId);
+                response.setSystemUserId(UUID.fromString(systemUserId));
                 response.setUserId((String) ((Map) s.get("from")).get("id"));
                 response.setCreatedDate(OffsetDateTime.parse((String) s.get("created_time"),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")).toLocalDateTime());
@@ -159,7 +159,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public FacebookPostResponse addPostToPage(UUID systemUserId, String pageId, FacebookPostRequest request) {
+    public FacebookPostResponse addPostToPage(String systemUserId, String pageId, FacebookPostRequest request) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -179,7 +179,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public FacebookPostResponse updatePostOfPage(UUID systemUserId, String pageId, String postId, FacebookPostRequest request) {
+    public FacebookPostResponse updatePostOfPage(String systemUserId, String pageId, String postId, FacebookPostRequest request) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -199,7 +199,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
     }
 
     @Override
-    public void deletePostOfPage(UUID systemUserId, String pageId, String postId) {
+    public void deletePostOfPage(String systemUserId, String pageId, String postId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 

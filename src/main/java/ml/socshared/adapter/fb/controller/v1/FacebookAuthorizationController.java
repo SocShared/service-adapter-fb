@@ -5,11 +5,17 @@ import ml.socshared.adapter.fb.api.v1.rest.FacebookAuthorizationApi;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpUnavailableRequestException;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.http.MediaType;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,31 +24,35 @@ import java.util.UUID;
 public class FacebookAuthorizationController implements FacebookAuthorizationApi {
 
     private FacebookAuthorizationService authService;
-    private UUID systemUserId;
 
     public FacebookAuthorizationController(FacebookAuthorizationService authService) {
         this.authService = authService;
     }
 
     @Override
-    @GetMapping(value = "/access/{systemUserId}")
-    public void getAccess(@PathVariable UUID systemUserId, HttpServletResponse response) throws Exception {
-        this.systemUserId = systemUserId;
+    @GetMapping(value = "/access")
+    public Map<String, String> getAccessUrl(KeycloakAuthenticationToken token) {
+
         String url = authService.getURLForAccess();
-        response.sendRedirect(url);
+
+        return new HashMap<>() {
+            { put("url_for_access", url); }
+        };
     }
 
     @Override
-    @GetMapping(value = "/token", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookUserResponse getToken(@RequestParam("code") String authorizationCode) {
-        if (systemUserId == null)
-            throw new HttpUnavailableRequestException();
+    @GetMapping(value = "/code_flow", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookUserResponse getTokenFacebook(@RequestParam("code") String authorizationCode, KeycloakAuthenticationToken token) {
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         return authService.getToken(systemUserId, authorizationCode);
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookUserResponse getUserDataBySystemUserId(@PathVariable UUID systemUserId) {
+    @GetMapping(value = "/facebook/token", produces = MediaType.APPLICATION_JSON_VALUE)
+    public FacebookUserResponse getUserDataBySystemUserId(KeycloakAuthenticationToken token) {
+        String systemUserId = ((KeycloakPrincipal) token.getPrincipal()).getKeycloakSecurityContext().getToken().getSubject();
+
         return authService.findUserDataBySystemUserId(systemUserId);
     }
 
