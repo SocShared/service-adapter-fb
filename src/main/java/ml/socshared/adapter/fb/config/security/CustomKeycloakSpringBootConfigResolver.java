@@ -6,12 +6,13 @@ import org.keycloak.adapters.KeycloakDeploymentBuilder;
 import org.keycloak.adapters.spi.HttpFacade;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootProperties;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile({Constants.DEV_PROFILE, Constants.PROD_PROFILE})
+@EnableConfigurationProperties(KeycloakSpringBootProperties.class)
 public class CustomKeycloakSpringBootConfigResolver extends KeycloakSpringBootConfigResolver {
     private final KeycloakDeployment keycloakDeployment;
 
