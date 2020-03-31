@@ -7,12 +7,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  main:
+    allow-bean-definition-overriding: true
 
 keycloak:
-  enabled: false
+  realm: dev
+  auth-server-url: https://keycloak.socshared.ml/auth
+  ssl-required: none
+  resource: fb-socshared-adapter
+  use-resource-role-mappings: false
+  principal-attribute: preferred_username
+  cors: true
+  bearer-only: true
 
 facebook:
   redirect:
-    uri: https://fb.socshared.ml/api/v1/token
+    uri: https://socshared.ml/connect/fb
   adapter:
     id: fb-adapter-prod

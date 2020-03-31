@@ -19,10 +19,6 @@ keycloak:
   principal-attribute: preferred_username
   cors: true
   bearer-only: true
-  security-constraints[0]:
-    authRoles[0]: ADMIN
-    securityCollections[0]:
-        patterns[0]: /api/v1/admin/*
 
 facebook:
   redirect:
