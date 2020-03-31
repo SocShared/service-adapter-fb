@@ -33,12 +33,6 @@ import org.springframework.security.web.authentication.session.SessionAuthentica
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Bean
-    @Primary
-    public KeycloakConfigResolver keycloakConfigResolver(KeycloakSpringBootProperties properties) {
-        return new CustomKeycloakSpringBootConfigResolver(properties);
-    }
-
-    @Bean
     public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
         SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
         mapper.setConvertToUpperCase(true);
