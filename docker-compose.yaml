@@ -1,7 +1,6 @@
 version: '3.7'
 services:
   socshared-adapter-fb:
-    container_name: socshared-adapter-fb
     image: vee97/socshared-adapter-fb
     ports:
       - 8081:8081
@@ -27,15 +26,13 @@ services:
       POSTGRES_DB: 'facebook_db'
 
   zipkin:
-    container_name: zipkin
     image: openzipkin/zipkin:2
     ports:
       - 9411:9411
 
   keycloak:
-    container_name: keycloak
     image: jboss/keycloak
-    command: -Djboss.http.port=9999
+    command: ["-Djboss.http.port=9999"]
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
