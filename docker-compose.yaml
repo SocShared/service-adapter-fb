@@ -37,8 +37,7 @@ services:
     environment:
       KEYCLOAK_USER: socshared
       KEYCLOAK_PASSWORD: socshared
-      KEYCLOAK_FRONTEND_URL: http://10.166.0.19:8080/auth
-      KEYCLOAK_HOSTNAME: 10.166.0.19:8080
+      KEYCLOAK_HOSTNAME: keycloak.socshared.ml
     deploy:
       replicas: 1
     ports:
