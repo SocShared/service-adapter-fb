@@ -9,6 +9,7 @@ import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookGroupService;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,19 +29,22 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1")
 @Validated
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class FacebookGroupController implements FacebookGroupApi {
 
     private final FacebookGroupService groupService;
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{pageId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{pageId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookGroupResponse getGroup(@PathVariable UUID systemUserId, @PathVariable String pageId) {
 
         return groupService.findPageBySystemUserIdAndPageId(systemUserId, pageId);
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{systemUserId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<FacebookGroupResponse> getGroups(@PathVariable UUID systemUserId,
                                                  @Min(0) @NotNull @RequestParam(name = "page", required = false) Integer page,
                                                  @Min(0) @Max(100) @NotNull @RequestParam(name = "size", required = false) Integer size) {

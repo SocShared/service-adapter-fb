@@ -6,6 +6,7 @@ import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookCommentResponse;
 import ml.socshared.adapter.fb.service.FacebookCommentService;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,12 +23,14 @@ import java.util.UUID;
 @RequestMapping(value = "/api/v1")
 @Validated
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class FacebookCommentController implements FacebookCommentApi {
 
     private final FacebookCommentService commentService;
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookCommentResponse getCommentOfPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                     @PathVariable String postId, @PathVariable String commentId) {
 
@@ -35,7 +38,8 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<FacebookCommentResponse> getCommentsByPostId(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                              @PathVariable String postId, @Min(0) @NotNull @RequestParam(value = "page", required = false) Integer page,
                                                              @Min(0) @Max(100) @NotNull @RequestParam(value = "size", required = false) Integer size) {
@@ -44,7 +48,8 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments/{subCommentId}")
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments/{subCommentId}")
     public FacebookCommentResponse getSubCommentOfComment(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId,
                                                             @PathVariable String commentId, @PathVariable String subCommentId) {
 
@@ -52,7 +57,8 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments")
+    @PreAuthorize("hasRole('SERVICE')")
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments")
     public Page<FacebookCommentResponse> getSubCommentsByCommentId(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                                      @PathVariable String postId, @PathVariable String commentId,
                                                                      @Min(0) @NotNull @RequestParam(value = "page", required = false) Integer page,
