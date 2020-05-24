@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.controller.v1;
 
+import lombok.RequiredArgsConstructor;
 import ml.socshared.adapter.fb.api.v1.rest.FacebookCommentApi;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookCommentResponse;
@@ -20,9 +21,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/api/v1")
 @Validated
+@RequiredArgsConstructor
 public class FacebookCommentController implements FacebookCommentApi {
 
-    private FacebookCommentService commentService;
+    private final FacebookCommentService commentService;
 
     public FacebookCommentController(FacebookCommentService commentService) {
         this.commentService = commentService;

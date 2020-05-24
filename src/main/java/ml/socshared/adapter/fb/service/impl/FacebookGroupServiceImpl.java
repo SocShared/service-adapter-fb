@@ -6,6 +6,7 @@ import ml.socshared.adapter.fb.domain.FacebookAdminClientGroup;
 import ml.socshared.adapter.fb.domain.group.TypeGroup;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
+import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.repository.FacebookAdminClientGroupRepository;
@@ -52,13 +53,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
     }
 
     @Override
-    public Page<FacebookGroupResponse> findGroupsBySystemUserId(String systemUserId, Integer page, Integer size) {
-        if (page < 0)
-            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
-        if (size < 0)
-            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
-        if (size > 100)
-            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
+    public Page<FacebookGroupResponse> findGroupsBySystemUserId(UUID systemUserId, Integer page, Integer size) {
 
         List<FacebookGroupResponse> facebookGroupResponseList = new LinkedList<>();
         Page<FacebookGroupResponse> pageResponse = new Page<>();
@@ -73,7 +68,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
 
             boolean isSelect = groupRepository.findById((String) map.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
-            response.setSystemUserId(UUID.fromString(systemUserId));
+            response.setSystemUserId(systemUserId);
             response.setGroupId((String) map.get("id"));
             response.setName((String) map.get("name"));
             response.setAdapterId(adapterId);
@@ -96,13 +91,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
 
     @Override
     @Cacheable(pages)
-    public Page<FacebookGroupResponse> findPagesBySystemUserId(String systemUserId, Integer page, Integer size) {
-        if (page < 0)
-            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
-        if (size < 0)
-            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
-        if (size > 100)
-            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
+    public Page<FacebookGroupResponse> findPagesBySystemUserId(UUID systemUserId, Integer page, Integer size) {
 
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
@@ -125,7 +114,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         pages.forEach(s -> {
             boolean isSelect = groupRepository.findById((String) s.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
-            response.setSystemUserId(UUID.fromString(systemUserId));
+            response.setSystemUserId(systemUserId);
             response.setGroupId((String) s.get("id"));
             response.setName((String) s.get("name"));
             response.setAdapterId(adapterId);
@@ -147,7 +136,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
     }
 
     @Override
-    public FacebookGroupResponse findGroupBySystemUserIdAndGroupId(String systemUserId, String groupId) {
+    public FacebookGroupResponse findGroupBySystemUserIdAndGroupId(UUID systemUserId, String groupId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -159,7 +148,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
 
         boolean isSelect = groupRepository.findById((String) group.get("id")).orElse(null) != null;
         FacebookGroupResponse response = new FacebookGroupResponse();
-        response.setSystemUserId(UUID.fromString(systemUserId));
+        response.setSystemUserId(systemUserId);
         response.setGroupId((String) group.get("id"));
         response.setName((String) group.get("name"));
         response.setAdapterId(adapterId);
@@ -173,7 +162,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
     }
 
     @Override
-    public FacebookGroupResponse findPageBySystemUserIdAndPageId(String systemUserId, String pageId) {
+    public FacebookGroupResponse findPageBySystemUserIdAndPageId(UUID systemUserId, String pageId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -183,7 +172,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
 
             boolean isSelect = groupRepository.findById((String) page.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
-            response.setSystemUserId(UUID.fromString(systemUserId));
+            response.setSystemUserId(systemUserId);
             response.setGroupId((String) page.get("id"));
             response.setName((String) page.get("name"));
             response.setAdapterId(adapterId);
@@ -201,7 +190,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
     }
 
     @Override
-    public Map<String, Boolean> selectPage(String systemUserId, String pageId, Boolean isSelect) {
+    public SuccessResponse selectPage(UUID systemUserId, String pageId, Boolean isSelect) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
 
@@ -215,20 +204,12 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
                 p.setType(TypeGroup.FB_PAGE);
 
                 groupRepository.save(p);
-                return new HashMap<>() {
-                    {
-                        put("success", true);
-                    }
-                };
+                return SuccessResponse.builder().success(true).build();
             }
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + pageId);
         }
 
-        return new HashMap<>() {
-            {
-                put("success", false);
-            }
-        };
+        return SuccessResponse.builder().success(false).build();
     }
 }

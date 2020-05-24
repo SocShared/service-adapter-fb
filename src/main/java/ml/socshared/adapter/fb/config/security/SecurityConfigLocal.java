@@ -7,8 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import static ml.socshared.storage.config.Constants.LOCAL_PROFILE;
-import static ml.socshared.storage.config.Constants.TEST_PROFILE;
+import static ml.socshared.adapter.fb.config.Constants.LOCAL_PROFILE;
+import static ml.socshared.adapter.fb.config.Constants.TEST_PROFILE;
 
 
 @Configuration

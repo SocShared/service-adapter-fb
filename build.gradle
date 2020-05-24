@@ -28,6 +28,12 @@ dependencies {
     implementation 'com.google.guava:guava:28.1-jre'
     implementation 'org.springframework.social:spring-social-facebook:3.0.0.M3'
     implementation 'org.springframework.social:spring-social-config:2.0.0.M4'
+
+    // Генерация JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.10.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.10.5'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }

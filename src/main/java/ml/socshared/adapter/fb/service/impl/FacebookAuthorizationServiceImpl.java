@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
@@ -22,19 +23,14 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationService {
 
     @Value("${facebook.redirect.uri}")
     private String redirectUri;
 
-    private FacebookConnectionFactory factory;
-    private FacebookAccessGrantService fagService;
-
-    public FacebookAuthorizationServiceImpl(FacebookConnectionFactory facebookConnectionFactory,
-                                            FacebookAccessGrantService fagService) {
-        this.factory = facebookConnectionFactory;
-        this.fagService = fagService;
-    }
+    private final FacebookConnectionFactory factory;
+    private final FacebookAccessGrantService fagService;
 
     @Override
     public String getURLForAccess() {
@@ -52,13 +48,14 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse getToken(String systemUserId, String authorizationCode) {
-        AccessGrant grant = factory.getOAuthOperations()
+    public AccessGrant getToken(UUID systemUserId, String authorizationCode) {
+//        saveToken(systemUserId, grant);
+//        log.info("Token: {}", grant.getAccessToken());
+//
+//        return findUserDataBySystemUserId(systemUserId);
+        // TODO: токен сохранять в Service Storage
+        return factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
-        saveToken(systemUserId, grant);
-        log.info("Token: {}", grant.getAccessToken());
-
-        return findUserDataBySystemUserId(systemUserId);
     }
 
     private void saveToken(String systemUserId, AccessGrant grant) {
@@ -85,7 +82,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse findUserDataBySystemUserId(String systemUserId) {
+    public FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId) {
         AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", accessGrant.getAccessToken());
         User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
@@ -95,7 +92,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         response.setEmail(user.getEmail());
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
-        response.setSystemUserId(UUID.fromString(systemUserId));
+        response.setSystemUserId(systemUserId);
         response.setUserId(user.getId());
         log.info("Facebook User Response: {}", response);
         return response;

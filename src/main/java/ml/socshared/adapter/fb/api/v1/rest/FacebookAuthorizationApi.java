@@ -19,7 +19,7 @@ public interface FacebookAuthorizationApi {
     FacebookUserResponse getUserDataBySystemUserId(UUID systemUserId);
 
     @ApiOperation(value = "Токена для доступа к API Facebook", notes = "Получение токена доступа для взаимодействия с API Facebook")
-    FacebookUserResponse getTokenFacebook(UUID systemUserId, String authorizationCode);
+    AccessGrant getTokenFacebook(UUID systemUserId, String authorizationCode);
 
     @ApiOperation(value = "URL-адрес для авторизации Facebook", notes = "Получение URL для авторизации в Facebook" +
             "с помощью OAuth2.0.")

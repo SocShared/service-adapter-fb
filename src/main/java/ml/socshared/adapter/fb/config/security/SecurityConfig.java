@@ -2,10 +2,11 @@ package ml.socshared.adapter.fb.config.security;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ml.socshared.storage.config.Constants;
-import ml.socshared.storage.config.security.jwt.JwtAuthenticationEntryPoint;
-import ml.socshared.storage.config.security.jwt.JwtConfigurer;
-import ml.socshared.storage.service.jwt.JwtTokenProvider;
+
+import ml.socshared.adapter.fb.config.Constants;
+import ml.socshared.adapter.fb.config.security.jwt.JwtAuthenticationEntryPoint;
+import ml.socshared.adapter.fb.config.security.jwt.JwtConfigurer;
+import ml.socshared.adapter.fb.service.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

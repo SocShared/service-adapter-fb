@@ -9,6 +9,6 @@ services:
     env_file:
       - .env_fb
 
-secrets:
-  postgres_password:
-    external: true
+networks:
+  default:
+    name: socshared

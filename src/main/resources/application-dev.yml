@@ -1,12 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres-db:5432/facebook_db
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}/${POSTGRES_DB:storage}
     driver-class-name: org.postgresql.Driver
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
   zipkin:
     base-url: http://zipkin:9411/
   main:
@@ -17,3 +18,7 @@ facebook:
     uri: https://socshared.ml/connect/fb
   adapter:
     id: fb-adapter-dev
+
+feign:
+  url:
+    auth: ${AUTH_SERVICE:https://auth.socshared.ml}

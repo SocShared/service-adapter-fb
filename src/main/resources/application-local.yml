@@ -16,3 +16,7 @@ facebook:
     uri: http://localhost:8081/api/v1/token
   adapter:
     id: fb-adapter-local
+
+feign:
+  url:
+    auth: ${AUTH_SERVICE:https://auth.socshared.ml}

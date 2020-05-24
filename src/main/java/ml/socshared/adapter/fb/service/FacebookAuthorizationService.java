@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface FacebookAuthorizationService {
 
     String getURLForAccess();
-    FacebookUserResponse getToken(UUID systemUserId, String authorizationCode);
+    AccessGrant getToken(UUID systemUserId, String authorizationCode);
     Connection<Facebook> getConnection(AccessGrant accessGrant);
     FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId);
 

@@ -6,6 +6,7 @@ import ml.socshared.adapter.fb.api.v1.rest.FacebookAuthorizationApi;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import org.springframework.http.MediaType;
+import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -32,8 +33,8 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/code_flow", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookUserResponse getTokenFacebook(@PathVariable UUID systemUserId, @RequestParam("code") String authorizationCode) {
+    @GetMapping(value = "/users/{systemUserId}/code/{authorizationCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public AccessGrant getTokenFacebook(@PathVariable UUID systemUserId, @PathVariable String authorizationCode) {
 
         return authService.getToken(systemUserId, authorizationCode);
     }

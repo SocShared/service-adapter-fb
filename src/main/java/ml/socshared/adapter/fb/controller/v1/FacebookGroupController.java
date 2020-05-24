@@ -5,6 +5,7 @@ import ml.socshared.adapter.fb.api.v1.rest.FacebookGroupApi;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.request.FacebookSelectGroupRequest;
 import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
+import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookGroupService;
 import org.springframework.http.MediaType;
@@ -48,8 +49,8 @@ public class FacebookGroupController implements FacebookGroupApi {
     @Override
     @PostMapping(value = "/users/{systemUserId}/groups/{groupId}", consumes = MediaType.APPLICATION_JSON_VALUE,
                                                                         produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Boolean> selectGroup(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                            @RequestBody FacebookSelectGroupRequest request) {
+    public SuccessResponse selectGroup(@PathVariable UUID systemUserId, @PathVariable String groupId,
+                                       @RequestBody FacebookSelectGroupRequest request) {
 
         return groupService.selectPage(systemUserId, groupId, request.getIsSelected());
     }

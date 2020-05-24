@@ -19,20 +19,23 @@ build:
 docker-build:
   stage: docker-build
   script:
-    - sudo docker build -t $CI_DOCKER_LOGIN/socshared-adapter-fb .
+    - docker 2>/dev/null 1>&2 rmi `docker images -aq` || true
+    - docker build -t $CI_DOCKER_LOGIN/socshared-adapter-fb .
 
 docker-push:
   stage: docker-push
   script:
-    - sudo docker login -u "$CI_DOCKER_LOGIN" -p "$CI_DOCKER_PASSWORD"
-    - sudo docker push $CI_DOCKER_LOGIN/socshared-adapter-fb
+    - docker login -u "$CI_DOCKER_LOGIN" -p "$CI_DOCKER_PASSWORD"
+    - docker push $CI_DOCKER_LOGIN/socshared-adapter-fb
 
 docker-deploy-swarm:
   stage: docker-deploy-swarm
   script:
     - touch .env_fb
     - echo "SPRING_PROFILE=dev" >> .env_fb
+    - echo "POSTGRES_HOST=fb_postgres_db" >> .env_fb
     - echo "POSTGRES_USER=admin" >> .env_fb
     - echo "POSTGRES_PASSWORD=admin" >> .env_fb
     - echo "POSTGRES_DB=fb" >> .env_fb
+    - echo "AUTH_SERVICE=auth_service" >> .env_fb
     - sudo docker stack deploy -c docker-compose.yaml socshared
