@@ -13,7 +13,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static ml.socshared.adapter.fb.config.Constants.TEST_PROFILE;
 
 @ExtendWith(SpringExtension.class)
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles(TEST_PROFILE)
 public abstract class AbstractIT {
