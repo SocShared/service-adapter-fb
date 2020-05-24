@@ -125,10 +125,11 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
         }
     }
 
+
     @Override
     @Cacheable(superComments)
-    public Page<FacebookCommentResponse> findCommentsOfSuperComment(UUID systemUserId, String pageId, String postId,
-                                                                    String superCommentId, Integer page, Integer size) {
+    public Page<FacebookCommentResponse> findSubCommentsOfComment(UUID systemUserId, String pageId, String postId,
+                                                                    String commentId, Integer page, Integer size) {
         if (page < 0)
             throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
         if (size < 0)
@@ -149,7 +150,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
             map.put("limit", Collections.singletonList(size.toString()));
             map.put("offset", Collections.singletonList(page * size + ""));
 
-            PagedList<Comment> comments = faService.getConnection(grant).getApi().fetchConnections(postId + "_" + superCommentId, "comments",
+            PagedList<Comment> comments = faService.getConnection(grant).getApi().fetchConnections(postId + "_" + commentId, "comments",
                     Comment.class, map);
 
             comments.forEach(s -> {
@@ -157,7 +158,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setSystemUserId(systemUserId);
                 response.setGroupId(pageId);
                 response.setPostId(postId);
-                response.setSuperCommentId(superCommentId);
+                response.setSuperCommentId(commentId);
                 response.setCommentId(s.getId().split("_")[1]);
                 response.setUserId(s.getFrom().getId());
                 response.setLikeCount(s.getLikeCount());
@@ -184,7 +185,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     }
 
     @Override
-    public FacebookCommentResponse findCommentOfSuperCommentByCommentId(UUID systemUserId, String pageId, String postId, String superCommentId, String commentId) {
+    public FacebookCommentResponse findSubCommentOfComment(UUID systemUserId, String pageId, String postId, String commentId, String subCommentId) {
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", grant.getAccessToken());
 
@@ -192,14 +193,14 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
             grant = new AccessGrant((String) faService.getConnection(grant).getApi().fetchObject(pageId, Map.class, "access_token").get("access_token"));
 
             try {
-                Comment comment = faService.getConnection(grant).getApi().fetchObject(postId + "_" + commentId, Comment.class,
+                Comment comment = faService.getConnection(grant).getApi().fetchObject(postId + "_" + subCommentId, Comment.class,
                         "id,message,created_time,like_count,comment_count,attachment,can_like,can_comment,from");
 
                 FacebookCommentResponse response = new FacebookCommentResponse();
                 response.setSystemUserId(systemUserId);
                 response.setGroupId(pageId);
                 response.setPostId(postId);
-                response.setSuperCommentId(superCommentId);
+                response.setSuperCommentId(commentId);
                 response.setCommentId(commentId);
                 response.setUserId(comment.getFrom().getId());
                 response.setLikeCount(comment.getLikeCount());

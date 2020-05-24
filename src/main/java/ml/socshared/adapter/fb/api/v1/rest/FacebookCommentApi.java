@@ -17,9 +17,9 @@ public interface FacebookCommentApi {
     Page<FacebookCommentResponse> getCommentsByPostId(UUID systemUserId, String groupId, String postId, Integer page, Integer size);
 
     @ApiOperation(value = "Комментарий суперкомментария поста группы пользователя", notes = "Возвращает определенный комментарий по id")
-    FacebookCommentResponse getCommentOfSuperComment(UUID systemUserId, String groupId, String postId, String superCommentId, String commentId);
+    FacebookCommentResponse getSubCommentOfComment(UUID systemUserId, String groupId, String postId, String commentId, String subCommentId);
 
     @ApiOperation(value = "Комменатрии суперкомментария поста группы пользователя", notes = "Возвращает комментарии определенного суперкомментария")
-    Page<FacebookCommentResponse> getCommentsBySuperCommentId(UUID systemUserId, String groupId, String postId, String superCommentId, Integer page, Integer size);
+    Page<FacebookCommentResponse> getSubCommentsByCommentId(UUID systemUserId, String groupId, String postId, String commentId, Integer page, Integer size);
 
 }

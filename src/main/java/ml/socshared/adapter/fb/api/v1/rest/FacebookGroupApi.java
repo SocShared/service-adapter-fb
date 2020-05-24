@@ -6,12 +6,7 @@ import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.request.FacebookSelectGroupRequest;
 import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
-import org.springframework.social.facebook.api.Group;
-import org.springframework.social.facebook.api.GroupMembership;
-import org.springframework.social.facebook.api.PagedList;
 
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Api(value = "Facebook Group API")

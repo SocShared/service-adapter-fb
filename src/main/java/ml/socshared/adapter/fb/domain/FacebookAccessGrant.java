@@ -31,7 +31,4 @@ public class FacebookAccessGrant {
     @Column(name = "expire_time")
     private Long expireTime;
 
-    @OneToMany(mappedBy = "facebookAccessGrant")
-    private Set<FacebookAdminClientGroup> facebookAdminClientGroups;
-
 }

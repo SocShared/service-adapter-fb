@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
@@ -13,13 +14,10 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FacebookAccessGrantServiceImpl implements FacebookAccessGrantService {
 
-    private FacebookAccessGrantRepository repository;
-
-    public FacebookAccessGrantServiceImpl(FacebookAccessGrantRepository repository) {
-        this.repository = repository;
-    }
+    private final FacebookAccessGrantRepository repository;
 
     @Override
     public Page<FacebookAccessGrant> findAll(Integer page, Integer size) {

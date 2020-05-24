@@ -2,12 +2,10 @@ package ml.socshared.adapter.fb.api.v1.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import ml.socshared.adapter.fb.domain.response.AccessUrlResponse;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import org.springframework.social.oauth2.AccessGrant;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletResponse;
-import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,10 +17,10 @@ public interface FacebookAuthorizationApi {
     FacebookUserResponse getUserDataBySystemUserId(UUID systemUserId);
 
     @ApiOperation(value = "Токена для доступа к API Facebook", notes = "Получение токена доступа для взаимодействия с API Facebook")
-    AccessGrant getTokenFacebook(UUID systemUserId, String authorizationCode);
+    FacebookUserResponse getTokenFacebook(UUID systemUserId, String authorizationCode);
 
     @ApiOperation(value = "URL-адрес для авторизации Facebook", notes = "Получение URL для авторизации в Facebook" +
             "с помощью OAuth2.0.")
-    Map<String, String> getAccessUrl();
+    AccessUrlResponse getAccessUrl();
 
 }

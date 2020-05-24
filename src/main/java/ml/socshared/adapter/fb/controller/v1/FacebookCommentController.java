@@ -26,10 +26,6 @@ public class FacebookCommentController implements FacebookCommentApi {
 
     private final FacebookCommentService commentService;
 
-    public FacebookCommentController(FacebookCommentService commentService) {
-        this.commentService = commentService;
-    }
-
     @Override
     @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookCommentResponse getCommentOfPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
@@ -48,20 +44,20 @@ public class FacebookCommentController implements FacebookCommentApi {
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/super_comments/{superCommentId}/comments/{commentId}")
-    public FacebookCommentResponse getCommentOfSuperComment(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId,
-                                                            @PathVariable String superCommentId, @PathVariable String commentId) {
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments/{subCommentId}")
+    public FacebookCommentResponse getSubCommentOfComment(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId,
+                                                            @PathVariable String commentId, @PathVariable String subCommentId) {
 
-        return commentService.findCommentOfSuperCommentByCommentId(systemUserId, groupId, postId, superCommentId, commentId);
+        return commentService.findSubCommentOfComment(systemUserId, groupId, postId, commentId, subCommentId);
     }
 
     @Override
-    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/super_comments/{superCommentId}/comments")
-    public Page<FacebookCommentResponse> getCommentsBySuperCommentId(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                                                     @PathVariable String postId, @PathVariable String superCommentId,
+    @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments")
+    public Page<FacebookCommentResponse> getSubCommentsByCommentId(@PathVariable UUID systemUserId, @PathVariable String groupId,
+                                                                     @PathVariable String postId, @PathVariable String commentId,
                                                                      @NotNull @RequestParam(value = "page", required = false) Integer page,
                                                                      @NotNull @RequestParam(value = "size", required = false) Integer size) {
 
-        return commentService.findCommentsOfSuperComment(systemUserId, groupId, postId, superCommentId, page, size);
+        return commentService.findCommentsOfSuperComment(systemUserId, groupId, postId, commentId, page, size);
     }
 }

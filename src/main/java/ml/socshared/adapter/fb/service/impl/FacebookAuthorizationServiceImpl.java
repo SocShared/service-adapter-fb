@@ -48,20 +48,19 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public AccessGrant getToken(UUID systemUserId, String authorizationCode) {
-//        saveToken(systemUserId, grant);
-//        log.info("Token: {}", grant.getAccessToken());
-//
-//        return findUserDataBySystemUserId(systemUserId);
-        // TODO: токен сохранять в Service Storage
-        return factory.getOAuthOperations()
+    public FacebookUserResponse getToken(UUID systemUserId, String authorizationCode) {
+        AccessGrant grant = factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
+        saveToken(systemUserId, grant);
+        log.info("Token: {}", grant.getAccessToken());
+
+        return findUserDataBySystemUserId(systemUserId);
     }
 
-    private void saveToken(String systemUserId, AccessGrant grant) {
+    private void saveToken(UUID systemUserId, AccessGrant grant) {
         User user = getConnection(grant).getApi().fetchObject("me", User.class, "id");
         FacebookAccessGrant fbAccessGrant = new FacebookAccessGrant();
-        fbAccessGrant.setSystemUserId(UUID.fromString(systemUserId));
+        fbAccessGrant.setSystemUserId(systemUserId);
         fbAccessGrant.setFacebookUserId(user.getId());
         fbAccessGrant.setAccessToken(grant.getAccessToken());
         fbAccessGrant.setExpireTime(grant.getExpireTime());

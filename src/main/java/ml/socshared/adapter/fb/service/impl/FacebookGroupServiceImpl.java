@@ -1,15 +1,12 @@
 package ml.socshared.adapter.fb.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
-import ml.socshared.adapter.fb.domain.FacebookAdminClientGroup;
 import ml.socshared.adapter.fb.domain.group.TypeGroup;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookGroupResponse;
-import ml.socshared.adapter.fb.domain.response.SuccessResponse;
-import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
-import ml.socshared.adapter.fb.repository.FacebookAdminClientGroupRepository;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookGroupService;
@@ -23,12 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FacebookGroupServiceImpl implements FacebookGroupService {
 
     @Value("${facebook.adapter.id}")
@@ -37,20 +33,9 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
     @Value("${cache.pages}")
     private final String pages = "pages";
 
-    private FacebookAuthorizationService faService;
-    private FacebookAccessGrantService fagService;
-    private FacebookAdminClientGroupRepository groupRepository;
-    private GroupBuffer groupBuffer;
-
-    public FacebookGroupServiceImpl(FacebookAuthorizationService faService,
-                                    FacebookAccessGrantService fagService,
-                                    FacebookAdminClientGroupRepository groupRepository,
-                                    GroupBuffer groupBuffer) {
-        this.faService = faService;
-        this.fagService = fagService;
-        this.groupRepository = groupRepository;
-        this.groupBuffer = groupBuffer;
-    }
+    private final FacebookAuthorizationService faService;
+    private final FacebookAccessGrantService fagService;
+    private final GroupBuffer groupBuffer;
 
     @Override
     public Page<FacebookGroupResponse> findGroupsBySystemUserId(UUID systemUserId, Integer page, Integer size) {
@@ -66,13 +51,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         for (i = page * size, j = 0; i < groups.size() && j < size; i++, j++) {
             Map map = groups.get(i);
 
-            boolean isSelect = groupRepository.findById((String) map.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
             response.setSystemUserId(systemUserId);
             response.setGroupId((String) map.get("id"));
             response.setName((String) map.get("name"));
             response.setAdapterId(adapterId);
-            response.setIsSelected(isSelect);
             response.setMembersCount((Integer) map.get("member_count"));
             response.setType(TypeGroup.FB_GROUP);
             facebookGroupResponseList.add(response);
@@ -112,13 +95,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
                 .fetchConnections(userResponse.getFacebookUserId(), "accounts", Map.class, pageParamMap);
 
         pages.forEach(s -> {
-            boolean isSelect = groupRepository.findById((String) s.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
             response.setSystemUserId(systemUserId);
             response.setGroupId((String) s.get("id"));
             response.setName((String) s.get("name"));
             response.setAdapterId(adapterId);
-            response.setIsSelected(isSelect);
             response.setMembersCount((Integer) s.get("talking_about_count"));
             response.setType(TypeGroup.FB_PAGE);
             facebookGroupResponseList.add(response);
@@ -146,13 +127,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         if (group.get("member_count") == null)
             throw new HttpNotFoundException("Not found group by id: " + groupId);
 
-        boolean isSelect = groupRepository.findById((String) group.get("id")).orElse(null) != null;
         FacebookGroupResponse response = new FacebookGroupResponse();
         response.setSystemUserId(systemUserId);
         response.setGroupId((String) group.get("id"));
         response.setName((String) group.get("name"));
         response.setAdapterId(adapterId);
-        response.setIsSelected(isSelect);
         response.setMembersCount((Integer) group.get("member_count"));
         response.setType(TypeGroup.FB_GROUP);
 
@@ -170,13 +149,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
             Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class,
                     "id", "name", "talking_about_count");
 
-            boolean isSelect = groupRepository.findById((String) page.get("id")).orElse(null) != null;
             FacebookGroupResponse response = new FacebookGroupResponse();
             response.setSystemUserId(systemUserId);
             response.setGroupId((String) page.get("id"));
             response.setName((String) page.get("name"));
             response.setAdapterId(adapterId);
-            response.setIsSelected(isSelect);
             response.setMembersCount((Integer) page.get("talking_about_count"));
             response.setType(TypeGroup.FB_PAGE);
 
@@ -187,29 +164,5 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + pageId);
         }
-    }
-
-    @Override
-    public SuccessResponse selectPage(UUID systemUserId, String pageId, Boolean isSelect) {
-        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
-        log.info("Token: {}", accessGrant.getAccessToken());
-
-        try {
-            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "id", "talking_about_count");
-
-            if (page != null && page.get("talking_about_count") != null) {
-                FacebookAdminClientGroup p = new FacebookAdminClientGroup();
-                p.setFacebookAccessGrant(fagService.findBySystemUserId(systemUserId));
-                p.setFacebookGroupId((String) page.get("id"));
-                p.setType(TypeGroup.FB_PAGE);
-
-                groupRepository.save(p);
-                return SuccessResponse.builder().success(true).build();
-            }
-        } catch (UncategorizedApiException exc) {
-            throw new HttpNotFoundException("Not found page by id: " + pageId);
-        }
-
-        return SuccessResponse.builder().success(false).build();
     }
 }
