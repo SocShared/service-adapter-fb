@@ -15,10 +15,10 @@ import java.util.UUID;
 
 public interface FacebookGroupService {
 
-    FacebookGroupResponse findGroupBySystemUserIdAndGroupId(String systemUserId, String groupId);
-    FacebookGroupResponse findPageBySystemUserIdAndPageId(String systemUserId, String pageId);
-    Page<FacebookGroupResponse> findGroupsBySystemUserId(String systemUserId, Integer page, Integer size);
-    Page<FacebookGroupResponse> findPagesBySystemUserId(String systemUserId, Integer page, Integer size);
-    Map<String, Boolean> selectPage(String systemUserId, String groupOrPageId, Boolean isSelect);
+    FacebookGroupResponse findGroupBySystemUserIdAndGroupId(UUID systemUserId, String groupId);
+    FacebookGroupResponse findPageBySystemUserIdAndPageId(UUID systemUserId, String pageId);
+    Page<FacebookGroupResponse> findGroupsBySystemUserId(UUID systemUserId, Integer page, Integer size);
+    Page<FacebookGroupResponse> findPagesBySystemUserId(UUID systemUserId, Integer page, Integer size);
+    Map<String, Boolean> selectPage(UUID systemUserId, String groupOrPageId, Boolean isSelect);
 
 }

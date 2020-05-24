@@ -1,47 +1,13 @@
 version: '3.7'
 services:
-  socshared-adapter-fb:
+  socshared_adapter_fb:
     image: vee97/socshared-adapter-fb
     ports:
       - 8081:8081
     deploy:
       replicas: 1
-    environment:
-      SPRING_PROFILE: dev
-      POSTGRES_USER: 'admin'
-      POSTGRES_PASSWORD: 'admin'
-      POSTGRES_DB: 'facebook_db'
-
-  postgres-db:
-    image: postgres:11
-    secrets:
-      - postgres_password
-    deploy:
-      replicas: 1
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_USER: 'admin'
-      POSTGRES_PASSWORD: 'admin'
-      POSTGRES_DB: 'facebook_db'
-
-  zipkin:
-    image: openzipkin/zipkin:2
-    deploy:
-      replicas: 1
-    ports:
-      - 9411:9411
-
-  keycloak:
-    image: jboss/keycloak
-    environment:
-      KEYCLOAK_USER: socshared
-      KEYCLOAK_PASSWORD: socshared
-      KEYCLOAK_FRONTEND_URL: https://keycloak.socshared.ml/auth
-    deploy:
-      replicas: 1
-    ports:
-      - 9999:8080
+    env_file:
+      - .env_fb
 
 secrets:
   postgres_password:

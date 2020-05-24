@@ -3,7 +3,6 @@ package ml.socshared.adapter.fb.api.v1.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.social.oauth2.AccessGrant;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -17,13 +16,13 @@ public interface FacebookAuthorizationApi {
 
     @ApiOperation(value = "Данные пользователя с токеном", notes = "Возвращает JSON-объект, " +
             "содержащий данные пользователя и токен доступа, по id пользователя Системы.")
-    FacebookUserResponse getUserDataBySystemUserId(KeycloakAuthenticationToken token);
+    FacebookUserResponse getUserDataBySystemUserId(UUID systemUserId);
 
     @ApiOperation(value = "Токена для доступа к API Facebook", notes = "Получение токена доступа для взаимодействия с API Facebook")
-    FacebookUserResponse getTokenFacebook(String authorizationCode, KeycloakAuthenticationToken token);
+    FacebookUserResponse getTokenFacebook(UUID systemUserId, String authorizationCode);
 
     @ApiOperation(value = "URL-адрес для авторизации Facebook", notes = "Получение URL для авторизации в Facebook" +
             "с помощью OAuth2.0.")
-    Map<String, String> getAccessUrl(KeycloakAuthenticationToken token);
+    Map<String, String> getAccessUrl();
 
 }

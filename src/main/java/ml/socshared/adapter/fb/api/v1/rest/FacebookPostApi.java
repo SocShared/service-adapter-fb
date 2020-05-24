@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.request.FacebookPostRequest;
 import ml.socshared.adapter.fb.domain.response.FacebookPostResponse;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 
 import java.util.UUID;
 
@@ -13,18 +12,18 @@ import java.util.UUID;
 public interface FacebookPostApi {
 
     @ApiOperation(value = "Пост группы пользователя", notes = "Возвращает определенный пост по id")
-    FacebookPostResponse getPost(String groupId, String postId, KeycloakAuthenticationToken token);
+    FacebookPostResponse getPost(UUID systemUserId, String groupId, String postId);
 
     @ApiOperation(value = "Посты группы пользователя", notes = "Возвращает посты определенной группы")
-    Page<FacebookPostResponse> getPosts(String groupOrPageId, Integer page, Integer size, KeycloakAuthenticationToken token);
+    Page<FacebookPostResponse> getPosts(UUID systemUserId, String groupOrPageId, Integer page, Integer size);
 
     @ApiOperation(value = "Добавление поста группы", notes = "Добавляет пост группы")
-    FacebookPostResponse addPost(String groupId, FacebookPostRequest request, KeycloakAuthenticationToken token);
+    FacebookPostResponse addPost(UUID systemUserId, String groupId, FacebookPostRequest request);
 
     @ApiOperation(value = "Обновление поста группы", notes = "Обновляет пост группы по id")
-    FacebookPostResponse updatePost(String groupId, String postId, FacebookPostRequest request, KeycloakAuthenticationToken token);
+    FacebookPostResponse updatePost(UUID systemUserId, String groupId, String postId, FacebookPostRequest request);
 
     @ApiOperation(value = "Удаление поста группы", notes = "Удаляет пост группы по id")
-    void deletePost(String groupId, String postId, KeycloakAuthenticationToken token);
+    void deletePost(UUID systemUserId, String groupId, String postId);
 
 }

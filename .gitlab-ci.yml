@@ -30,4 +30,9 @@ docker-push:
 docker-deploy-swarm:
   stage: docker-deploy-swarm
   script:
+    - touch .env_fb
+    - echo "SPRING_PROFILE=dev" >> .env_fb
+    - echo "POSTGRES_USER=admin" >> .env_fb
+    - echo "POSTGRES_PASSWORD=admin" >> .env_fb
+    - echo "POSTGRES_DB=fb" >> .env_fb
     - sudo docker stack deploy -c docker-compose.yaml socshared

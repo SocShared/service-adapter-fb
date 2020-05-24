@@ -9,8 +9,6 @@ spring:
     facebook:
       appId: 226788808719091
       appSecret: 355b16f0395f94c27319b5b080068b02
-keycloak:
-  enabled: false
 
 cache:
   pages: pages
