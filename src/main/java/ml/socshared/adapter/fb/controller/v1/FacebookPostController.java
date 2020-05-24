@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -34,8 +36,8 @@ public class FacebookPostController implements FacebookPostApi {
     @Override
     @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<FacebookPostResponse> getPosts(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                               @NotNull @RequestParam(name = "page", required = false) Integer page,
-                                               @NotNull @RequestParam(name = "size", required = false) Integer size) {
+                                               @Min(0) @NotNull @RequestParam(name = "page", required = false) Integer page,
+                                               @Min(0) @Max(100) @NotNull @RequestParam(name = "size", required = false) Integer size) {
 
         return postService.getPostsByPageId(systemUserId, groupId, page, size);
     }

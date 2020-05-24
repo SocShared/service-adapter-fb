@@ -130,12 +130,6 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
     @Cacheable(superComments)
     public Page<FacebookCommentResponse> findSubCommentsOfComment(UUID systemUserId, String pageId, String postId,
                                                                     String commentId, Integer page, Integer size) {
-        if (page < 0)
-            throw new HttpBadRequestException(String.format("Error: page parameter contains invalid value (%d)", page));
-        if (size < 0)
-            throw new HttpBadRequestException(String.format("Error: size parameter contains invalid value (%d)", size));
-        if (size > 100)
-            throw new HttpBadRequestException(String.format("Error: the maximum value of size parameter is 100 (%d)", size));
 
         AccessGrant grant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
         log.info("Token: {}", grant.getAccessToken());

@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.UUID;
@@ -40,18 +42,10 @@ public class FacebookGroupController implements FacebookGroupApi {
     @Override
     @GetMapping(value = "/users/{systemUserId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<FacebookGroupResponse> getGroups(@PathVariable UUID systemUserId,
-                                                 @NotNull @RequestParam(name = "page", required = false) Integer page,
-                                                 @NotNull @RequestParam(name = "size", required = false) Integer size) {
+                                                 @Min(0) @NotNull @RequestParam(name = "page", required = false) Integer page,
+                                                 @Min(0) @Max(100) @NotNull @RequestParam(name = "size", required = false) Integer size) {
 
         return groupService.findPagesBySystemUserId(systemUserId, page, size);
     }
 
-    @Override
-    @PostMapping(value = "/users/{systemUserId}/groups/{groupId}", consumes = MediaType.APPLICATION_JSON_VALUE,
-                                                                        produces = MediaType.APPLICATION_JSON_VALUE)
-    public SuccessResponse selectGroup(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                       @RequestBody FacebookSelectGroupRequest request) {
-
-        return groupService.selectPage(systemUserId, groupId, request.getIsSelected());
-    }
 }

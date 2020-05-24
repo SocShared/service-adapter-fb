@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import ml.socshared.adapter.fb.api.v1.rest.FacebookCommentApi;
 import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.response.FacebookCommentResponse;
-import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookCommentService;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -14,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
@@ -37,8 +37,8 @@ public class FacebookCommentController implements FacebookCommentApi {
     @Override
     @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<FacebookCommentResponse> getCommentsByPostId(@PathVariable UUID systemUserId, @PathVariable String groupId,
-                                                             @PathVariable String postId, @NotNull @RequestParam(value = "page", required = false) Integer page,
-                                                             @NotNull @RequestParam(value = "size", required = false) Integer size) {
+                                                             @PathVariable String postId, @Min(0) @NotNull @RequestParam(value = "page", required = false) Integer page,
+                                                             @Min(0) @Max(100) @NotNull @RequestParam(value = "size", required = false) Integer size) {
 
         return commentService.findCommentsOfPost(systemUserId, groupId, postId, page, size);
     }
@@ -55,9 +55,9 @@ public class FacebookCommentController implements FacebookCommentApi {
     @GetMapping(value = "/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}/sub_comments")
     public Page<FacebookCommentResponse> getSubCommentsByCommentId(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                                      @PathVariable String postId, @PathVariable String commentId,
-                                                                     @NotNull @RequestParam(value = "page", required = false) Integer page,
-                                                                     @NotNull @RequestParam(value = "size", required = false) Integer size) {
+                                                                     @Min(0) @NotNull @RequestParam(value = "page", required = false) Integer page,
+                                                                     @Min(0) @Max(100) @NotNull @RequestParam(value = "size", required = false) Integer size) {
 
-        return commentService.findCommentsOfSuperComment(systemUserId, groupId, postId, commentId, page, size);
+        return commentService.findSubCommentsOfComment(systemUserId, groupId, postId, commentId, page, size);
     }
 }

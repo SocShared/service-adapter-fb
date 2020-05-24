@@ -16,9 +16,6 @@ public interface FacebookGroupApi {
             "по id пользователя и по id группы")
     FacebookGroupResponse getGroup(UUID systemUserId, String groupId);
 
-    @ApiOperation(value = "Изменение группы на выбранную или нет", notes = "Возвращает группу или страницу ")
-    SuccessResponse selectGroup(UUID systemUserId, String groupId, FacebookSelectGroupRequest request);
-
     @ApiOperation(value = "Группы пользователя, в которых является админом", notes = "Возвращает группы пользователя " +
             "по id пользователя, в которых он является админом")
     Page<FacebookGroupResponse> getGroups(UUID systemUserId, Integer page, Integer size);
