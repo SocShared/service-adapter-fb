@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  socshared_adapter_fb:
+  fb_adapter:
     image: vee97/socshared-adapter-fb
     ports:
       - 8081:8081
