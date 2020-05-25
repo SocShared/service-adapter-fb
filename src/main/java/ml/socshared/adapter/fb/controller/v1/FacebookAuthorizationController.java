@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.api.v1.rest.FacebookAuthorizationApi;
 import ml.socshared.adapter.fb.domain.response.AccessUrlResponse;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
+import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,20 +32,17 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
         return AccessUrlResponse.builder().urlForAccess(url).build();
     }
 
-    //TODO: вернуть SuccessResponse
     @Override
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/{systemUserId}/code/{authorizationCode}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public FacebookUserResponse getTokenFacebook(@PathVariable UUID systemUserId, @PathVariable String authorizationCode) {
-
-        return authService.getToken(systemUserId, authorizationCode);
+    public SuccessResponse saveAccountFacebook(@PathVariable UUID systemUserId, @PathVariable String authorizationCode) {
+        return authService.saveAccountFacebook(systemUserId, authorizationCode);
     }
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/facebook/token", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/facebook/data", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookUserResponse getUserDataBySystemUserId(@PathVariable UUID systemUserId) {
-
         return authService.findUserDataBySystemUserId(systemUserId);
     }
 

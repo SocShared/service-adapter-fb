@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
+import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
@@ -48,13 +49,15 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     }
 
     @Override
-    public FacebookUserResponse getToken(UUID systemUserId, String authorizationCode) {
+    public SuccessResponse saveAccountFacebook(UUID systemUserId, String authorizationCode) {
         AccessGrant grant = factory.getOAuthOperations()
                 .exchangeForAccess(authorizationCode, redirectUri, null);
         saveToken(systemUserId, grant);
         log.info("Token: {}", grant.getAccessToken());
 
-        return findUserDataBySystemUserId(systemUserId);
+        return SuccessResponse.builder()
+                .success(true)
+                .build();
     }
 
     private void saveToken(UUID systemUserId, AccessGrant grant) {
