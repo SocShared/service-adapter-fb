@@ -31,7 +31,7 @@ public class JwtTokenProvider {
 
         return ServiceDetails.builder()
                 .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_" + role)))
-                .username(claims.get("to_service", String.class))
+                .username(claims.get("from_service", String.class))
                 .accountNonLocked(true)
                 .build();
     }

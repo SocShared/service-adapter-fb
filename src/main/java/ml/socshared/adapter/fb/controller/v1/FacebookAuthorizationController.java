@@ -31,6 +31,7 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
         return AccessUrlResponse.builder().urlForAccess(url).build();
     }
 
+    //TODO: вернуть SuccessResponse
     @Override
     @PreAuthorize("hasRole('SERVICE')")
     @GetMapping(value = "/private/users/{systemUserId}/code/{authorizationCode}", produces = MediaType.APPLICATION_JSON_VALUE)
