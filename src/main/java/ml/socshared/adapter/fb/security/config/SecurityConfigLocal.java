@@ -1,4 +1,4 @@
-package ml.socshared.adapter.fb.config.security;
+package ml.socshared.adapter.fb.security.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import static ml.socshared.adapter.fb.config.Constants.LOCAL_PROFILE;
 import static ml.socshared.adapter.fb.config.Constants.TEST_PROFILE;
 
 

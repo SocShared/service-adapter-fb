@@ -1,4 +1,4 @@
-package ml.socshared.adapter.fb.service.jwt;
+package ml.socshared.adapter.fb.security.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;

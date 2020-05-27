@@ -1,4 +1,4 @@
-package ml.socshared.adapter.fb.config.security.jwt;
+package ml.socshared.adapter.fb.security.jwt;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

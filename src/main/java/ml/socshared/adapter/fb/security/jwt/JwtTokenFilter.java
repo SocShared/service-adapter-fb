@@ -1,7 +1,6 @@
-package ml.socshared.adapter.fb.config.security.jwt;
+package ml.socshared.adapter.fb.security.jwt;
 
 import lombok.RequiredArgsConstructor;
-import ml.socshared.adapter.fb.service.jwt.JwtTokenProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
