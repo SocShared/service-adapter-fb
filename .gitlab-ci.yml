@@ -37,5 +37,5 @@ docker-deploy-swarm:
     - echo "POSTGRES_USER=admin" >> .env_fb
     - echo "POSTGRES_PASSWORD=admin" >> .env_fb
     - echo "POSTGRES_DB=fb" >> .env_fb
-    - echo "AUTH_SERVICE=auth_service" >> .env_fb
+    - echo "AUTH_SERVICE=auth-service:9999" >> .env_fb
     - docker stack deploy -c docker-compose.yaml socshared
