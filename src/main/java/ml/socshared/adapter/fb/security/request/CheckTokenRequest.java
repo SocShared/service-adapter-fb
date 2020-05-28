@@ -1,4 +1,4 @@
-package ml.socshared.adapter.fb.domain.request;
+package ml.socshared.adapter.fb.security.request;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package ml.socshared.adapter.fb.domain.model;
+package ml.socshared.adapter.fb.security.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;

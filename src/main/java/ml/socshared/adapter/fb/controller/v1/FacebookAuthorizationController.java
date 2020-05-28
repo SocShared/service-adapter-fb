@@ -24,7 +24,7 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/access")
+    @GetMapping(value = "/private/access", produces = MediaType.APPLICATION_JSON_VALUE)
     public AccessUrlResponse getAccessUrl() {
 
         String url = authService.getURLForAccess();

@@ -6,7 +6,6 @@ import lombok.*;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Builder
 public class SuccessResponse {
 
     private Boolean success;

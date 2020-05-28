@@ -55,9 +55,10 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         saveToken(systemUserId, grant);
         log.info("Token: {}", grant.getAccessToken());
 
-        return SuccessResponse.builder()
-                .success(true)
-                .build();
+        SuccessResponse successResponse = new SuccessResponse();
+        successResponse.setSuccess(true);
+
+        return successResponse;
     }
 
     private void saveToken(UUID systemUserId, AccessGrant grant) {

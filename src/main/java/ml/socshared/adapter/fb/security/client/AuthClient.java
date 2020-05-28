@@ -1,6 +1,6 @@
-package ml.socshared.adapter.fb.client;
+package ml.socshared.adapter.fb.security.client;
 
-import ml.socshared.adapter.fb.domain.request.CheckTokenRequest;
+import ml.socshared.adapter.fb.security.request.CheckTokenRequest;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
