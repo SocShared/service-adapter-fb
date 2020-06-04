@@ -8,6 +8,8 @@ import org.springframework.social.RateLimitExceededException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -26,6 +28,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, AbstractRestHandleableException exc) {
         log.error(exc.getMessage());
         return buildErrorResponse(exc, exc.getHttpStatus(), webRequest);
+    }
+
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, HttpClientErrorException exc) {
+        log.error(exc.getMessage());
+        return buildErrorResponse(exc, exc.getStatusCode(), webRequest);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -13,7 +13,7 @@ spring:
 
 facebook:
   redirect:
-    uri: http://localhost:8081/api/v1/token
+    uri: https://socshared.ml/facebook/callback
   adapter:
     id: fb-adapter-local
 
