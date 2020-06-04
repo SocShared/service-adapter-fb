@@ -1,7 +1,9 @@
 package ml.socshared.adapter.fb.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.exception.AbstractRestHandleableException;
+import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.social.RateLimitExceededException;
@@ -14,6 +16,8 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.ServletException;
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
@@ -31,9 +35,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
-    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, HttpClientErrorException exc) {
+    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, HttpClientErrorException exc) throws Exception {
         log.error(exc.getMessage());
-        return buildErrorResponse(exc, exc.getStatusCode(), webRequest);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> json = mapper.readValue(exc.getMessage(), HashMap.class);
+        Map<String, Object> object = (HashMap) json.get("error");
+        String message = (String) object.get("message");
+        return buildErrorResponse(new HttpClientErrorException(exc.getStatusCode(), message), exc.getStatusCode(), webRequest);
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
