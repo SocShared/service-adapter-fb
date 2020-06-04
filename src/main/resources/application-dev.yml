@@ -15,7 +15,7 @@ spring:
 
 facebook:
   redirect:
-    uri: https://www.socshared.ml/connect/fb
+    uri: https://socshared.ml/facebook/callback
   adapter:
     id: fb-adapter-dev
 
