@@ -6,6 +6,7 @@ import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
+import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,20 +87,24 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
 
     @Override
     public FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId) {
-        AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
-        log.info("Token: {}", accessGrant.getAccessToken());
-        User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
-        log.info("User: {}", user.getId());
-        FacebookUserResponse response = new FacebookUserResponse();
-        response.setAccessToken(accessGrant.getAccessToken());
-        response.setEmail(user.getEmail());
-        response.setFirstName(user.getFirstName());
-        response.setLastName(user.getLastName());
-        response.setSystemUserId(systemUserId);
-        response.setAccountId(user.getId());
-        response.setSocialNetwork("FB");
-        log.info("Facebook User Response: {}", response);
-        return response;
+        try {
+            AccessGrant accessGrant = new AccessGrant(fagService.findBySystemUserId(systemUserId).getAccessToken());
+            log.info("Token: {}", accessGrant.getAccessToken());
+            User user = getConnection(accessGrant).getApi().fetchObject("me", User.class, "id", "email", "first_name", "last_name");
+            log.info("User: {}", user.getId());
+            FacebookUserResponse response = new FacebookUserResponse();
+            response.setAccessToken(accessGrant.getAccessToken());
+            response.setEmail(user.getEmail());
+            response.setFirstName(user.getFirstName());
+            response.setLastName(user.getLastName());
+            response.setSystemUserId(systemUserId);
+            response.setAccountId(user.getId());
+            response.setSocialNetwork("FB");
+            log.info("Facebook User Response: {}", response);
+            return response;
+        } catch (HttpNotFoundException exc) {
+            return null;
+        }
     }
 
     @Override
