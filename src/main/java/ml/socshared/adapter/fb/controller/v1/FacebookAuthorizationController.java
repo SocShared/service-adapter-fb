@@ -48,7 +48,7 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/facebook", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/private/users/{systemUserId}/facebook", produces = MediaType.APPLICATION_JSON_VALUE)
     public void deleteAccountFacebook(@PathVariable UUID systemUserId) {
         authService.deleteFacebookAccount(systemUserId);
     }
