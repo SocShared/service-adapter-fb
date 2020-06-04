@@ -14,10 +14,11 @@ import java.util.UUID;
 public class FacebookUserResponse {
 
     private UUID systemUserId;
-    private String userId;
+    private String accountId;
     private String firstName;
     private String lastName;
     private String email;
+    private String socialNetwork;
     private String accessToken;
 
 }

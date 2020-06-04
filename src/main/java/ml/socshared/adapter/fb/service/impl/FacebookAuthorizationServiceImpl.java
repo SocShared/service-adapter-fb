@@ -96,7 +96,8 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         response.setFirstName(user.getFirstName());
         response.setLastName(user.getLastName());
         response.setSystemUserId(systemUserId);
-        response.setUserId(user.getId());
+        response.setAccountId(user.getId());
+        response.setSocialNetwork("FB");
         log.info("Facebook User Response: {}", response);
         return response;
     }
