@@ -24,4 +24,6 @@ public interface FacebookAuthorizationApi {
             "с помощью OAuth2.0.")
     AccessUrlResponse getAccessUrl();
 
+    void deleteAccountFacebook(UUID systemUserId);
+
 }

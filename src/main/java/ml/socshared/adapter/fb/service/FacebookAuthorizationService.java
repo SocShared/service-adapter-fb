@@ -14,5 +14,6 @@ public interface FacebookAuthorizationService {
     SuccessResponse saveAccountFacebook(UUID systemUserId, String authorizationCode);
     Connection<Facebook> getConnection(AccessGrant accessGrant);
     FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId);
+    void deleteFacebookAccount(UUID systemUserId);
 
 }

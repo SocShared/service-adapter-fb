@@ -101,4 +101,9 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         log.info("Facebook User Response: {}", response);
         return response;
     }
+
+    @Override
+    public void deleteFacebookAccount(UUID systemUserId) {
+        fagService.deleteBySystemUserId(systemUserId);
+    }
 }
