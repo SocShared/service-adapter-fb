@@ -87,7 +87,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         pageResponse.setHasNext(false);
 
         MultiValueMap<String, String> pageParamMap = new LinkedMultiValueMap<>();
-        pageParamMap.put("fields", Collections.singletonList("id,name,talking_about_count,tasks"));
+        pageParamMap.put("fields", Collections.singletonList("id,name,fan_count,tasks"));
         pageParamMap.put("limit", Collections.singletonList(size + ""));
         pageParamMap.put("offset", Collections.singletonList(page * size + ""));
 
@@ -100,7 +100,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
             response.setGroupId((String) s.get("id"));
             response.setName((String) s.get("name"));
             response.setAdapterId(adapterId);
-            response.setMembersCount((Integer) s.get("talking_about_count"));
+            response.setMembersCount((Integer) s.get("fan_count"));
             response.setType(TypeGroup.FB_PAGE);
             facebookGroupResponseList.add(response);
         });
