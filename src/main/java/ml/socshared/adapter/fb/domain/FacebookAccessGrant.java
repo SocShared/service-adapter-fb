@@ -16,7 +16,7 @@ public class FacebookAccessGrant {
     @Column(name = "system_user_id", nullable = false)
     private UUID systemUserId;
 
-    @Column(name = "facebook_user_id", nullable = false, unique = true)
+    @Column(name = "facebook_user_id", nullable = false)
     private String facebookUserId;
 
     @Column(name = "access_token", nullable = false)
