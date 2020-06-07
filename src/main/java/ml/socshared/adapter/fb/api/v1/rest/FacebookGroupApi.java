@@ -21,7 +21,8 @@ public interface FacebookGroupApi {
 
     @ApiOperation(value = "Группы пользователя, в которых является админом", notes = "Возвращает группы пользователя " +
             "по id пользователя, в которых он является админом")
-    Page<FacebookGroupResponse> getGroups(UUID systemUserId, @Min(0) @NotNull Integer page,
+    Page<FacebookGroupResponse> getGroups(UUID systemUserId,
+                                          @Min(0) @NotNull Integer page,
                                           @NotNull @Min(0) @Max(100) Integer size);
 
 }

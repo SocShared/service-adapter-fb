@@ -6,6 +6,9 @@ import ml.socshared.adapter.fb.domain.page.Page;
 import ml.socshared.adapter.fb.domain.request.FacebookPostRequest;
 import ml.socshared.adapter.fb.domain.response.FacebookPostResponse;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Api(value = "Facebook Post API")
@@ -15,7 +18,9 @@ public interface FacebookPostApi {
     FacebookPostResponse getPost(UUID systemUserId, String groupId, String postId);
 
     @ApiOperation(value = "Посты группы пользователя", notes = "Возвращает посты определенной группы")
-    Page<FacebookPostResponse> getPosts(UUID systemUserId, String groupOrPageId, Integer page, Integer size);
+    Page<FacebookPostResponse> getPosts(UUID systemUserId, String groupOrPageId,
+                                        @Min(0) @NotNull Integer page,
+                                        @Min(0) @Max(100) @NotNull Integer size);
 
     @ApiOperation(value = "Добавление поста группы", notes = "Добавляет пост группы")
     FacebookPostResponse addPost(UUID systemUserId, String groupId, FacebookPostRequest request);
