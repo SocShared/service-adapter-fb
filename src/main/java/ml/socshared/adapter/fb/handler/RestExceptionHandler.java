@@ -6,6 +6,7 @@ import ml.socshared.adapter.fb.exception.AbstractRestHandleableException;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.social.DuplicateStatusException;
 import org.springframework.social.RateLimitExceededException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,6 +57,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, RateLimitExceededException exc) {
         log.error(exc.getMessage());
         return buildErrorResponse(exc, HttpStatus.BAD_GATEWAY, webRequest);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DuplicateStatusException.class)
+    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, DuplicateStatusException exc) {
+        log.error(exc.getMessage());
+        return buildErrorResponse(exc, HttpStatus.BAD_REQUEST, webRequest);
     }
 
 }
