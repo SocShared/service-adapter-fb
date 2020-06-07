@@ -47,12 +47,12 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            Map page = faService.getFacebookTemplate(accessGrant.getAccessToken()).fetchObject(pageId, Map.class, "access_token");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
-            log.info("Token page: {}");
+
             try {
-                Map post = faService.getFacebookTemplate(accessGrant.getAccessToken())
-                        .fetchObject(pageId + "_" + postId, Map.class, "id,message,from{id},created_time,updated_time," +
+                Map post = faService.getConnection(accessGrant).getApi()
+                        .fetchObject(postId, Map.class, "id,message,from{id},created_time,updated_time," +
                                 "insights.metric(post_impressions){name,values},likes.summary(1).limit(0){summary},comments.summary(1).limit(0){summary},shares");
 
                 FacebookPostResponse response = new FacebookPostResponse();
@@ -80,11 +80,9 @@ public class FacebookPostServiceImpl implements FacebookPostService {
 
                 return response;
             } catch (UncategorizedApiException exc) {
-                exc.printStackTrace();
                 throw new HttpNotFoundException("Not found post by id: " + postId);
             }
         } catch (UncategorizedApiException exc) {
-            exc.printStackTrace();
             throw new HttpNotFoundException("Not found page by id: " + pageId);
         }
     }
@@ -156,16 +154,13 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         log.info("Token: {}", accessGrant.getAccessToken());
 
         try {
-            Map page = faService.getFacebookTemplate(accessGrant.getAccessToken())
-                    .fetchObject(pageId, Map.class, "access_token");
+            Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
 
             PostData postData = new PostData(pageId);
             postData.message(request.getMessage());
 
-            //String id = faService.getConnection(accessGrant).getApi().feedOperations().post(postData);
-
-            String id = faService.getFacebookTemplate(accessGrant.getAccessToken()).feedOperations().post(postData);
+            String id = faService.getConnection(accessGrant).getApi().feedOperations().post(postData);
 
             return getPostByPostIdOfPage(systemUserId, pageId, id);
         } catch (UncategorizedApiException exc) {

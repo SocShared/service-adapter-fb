@@ -33,7 +33,7 @@ public class FacebookPostController implements FacebookPostApi {
     @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public FacebookPostResponse getPost(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId) {
 
-        return postService.getPostByPostIdOfPage(systemUserId, groupId, postId);
+        return postService.getPostByPostIdOfPage(systemUserId, groupId, groupId + "_" + postId);
     }
 
     @Override
