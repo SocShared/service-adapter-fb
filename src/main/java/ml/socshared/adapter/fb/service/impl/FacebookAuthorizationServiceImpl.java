@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.AccessGrant;
 import org.springframework.social.oauth2.OAuth2Operations;
@@ -83,6 +84,14 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
         Connection<Facebook> connFacebook = factory.createConnection(accessGrant);
         log.info("Connection Facebook: User Name - {}", connFacebook.getDisplayName());
         return connFacebook;
+    }
+
+    @Override
+    @Cacheable("facebook_template")
+    public FacebookTemplate getFacebookTemplate(String accessToken) {
+        FacebookTemplate facebookTemplate = new FacebookTemplate(accessToken);
+        facebookTemplate.setApiVersion("6.0");
+        return facebookTemplate;
     }
 
     @Override
