@@ -6,7 +6,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 
-@EnableCaching
 @Configuration
 public class CacheConfig {
 
@@ -26,7 +25,7 @@ public class CacheConfig {
     private final String superComments = "super_comments";
 
     @CacheEvict(allEntries = true, cacheNames = {pages, groups, posts, comments, superComments})
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 10000)
     public void cacheEvict () {
     }
 }
