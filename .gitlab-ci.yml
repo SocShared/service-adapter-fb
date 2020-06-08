@@ -33,7 +33,7 @@ docker-deploy-swarm:
   script:
     - touch .env_fb
     - echo "SPRING_PROFILE=dev" >> .env_fb
-    - echo "POSTGRES_HOST=pg.socshared.ml:5533" >> .env_fb
+    - echo "POSTGRES_HOST=postgres-db" >> .env_fb
     - echo "POSTGRES_USER=admin" >> .env_fb
     - echo "POSTGRES_PASSWORD=admin" >> .env_fb
     - echo "POSTGRES_DB=fb" >> .env_fb
