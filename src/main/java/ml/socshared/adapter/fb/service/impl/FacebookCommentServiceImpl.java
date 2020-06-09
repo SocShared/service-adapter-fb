@@ -228,7 +228,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 sentryMap.put("post_id", postId);
                 sentryMap.put("comment_id", commentId);
                 sentryMap.put("sub_comment_id", subCommentId);
-                sentrySender.sentryMessage("get sub comment of comment", sentryMap, Collections.singletonList(SentryTag.GET_SUB_COMMENTS));
+                sentrySender.sentryMessage("get sub comment of comment", sentryMap, Collections.singletonList(SentryTag.GET_SUB_COMMENT_BY_ID));
 
                 return response;
             } catch (UncategorizedApiException exc) {
