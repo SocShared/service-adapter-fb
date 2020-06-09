@@ -53,13 +53,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(exc, HttpStatus.NOT_FOUND, webRequest);
     }
 
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    @ExceptionHandler(RateLimitExceededException.class)
-    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, RateLimitExceededException exc) {
-        log.error(exc.getMessage());
-        return buildErrorResponse(exc, HttpStatus.BAD_GATEWAY, webRequest);
-    }
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(SocialException.class)
     public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, SocialException exc) {
