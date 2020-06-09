@@ -62,7 +62,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(SocialException.class)
-    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, DuplicateStatusException exc) {
+    public ResponseEntity<RestApiError> handlePrintException(ServletWebRequest webRequest, SocialException exc) {
         log.error(exc.getMessage());
         return buildErrorResponse(exc, HttpStatus.BAD_REQUEST, webRequest);
     }
