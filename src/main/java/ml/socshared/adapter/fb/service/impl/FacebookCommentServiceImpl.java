@@ -9,6 +9,8 @@ import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookCommentService;
+import ml.socshared.adapter.fb.service.sentry.SentrySender;
+import ml.socshared.adapter.fb.service.sentry.SentryTag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.UncategorizedApiException;
@@ -21,11 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -41,6 +39,7 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
 
     private final FacebookAuthorizationService faService;
     private final FacebookAccessGrantService fagService;
+    private final SentrySender sentrySender;
 
     @Override
     @Cacheable(comments)
@@ -86,6 +85,12 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
             result.setHasNext(comments.getNextPage() != null);
             result.setHasPrev(comments.getPreviousPage() != null);
 
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentryMap.put("post_id", postId);
+            sentrySender.sentryMessage("get comments of post", sentryMap, Collections.singletonList(SentryTag.COMMENTS_OF_POST));
+
             return result;
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + postId);
@@ -115,6 +120,13 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setMessage(comment.getMessage());
                 response.setCreatedDate(comment.getCreatedTime());
                 response.setAdapterId(adapterId);
+
+                Map<String, Object> sentryMap = new HashMap<>();
+                sentryMap.put("system_user_id", systemUserId);
+                sentryMap.put("page_id", pageId);
+                sentryMap.put("post_id", postId);
+                sentryMap.put("comment_id", commentId);
+                sentrySender.sentryMessage("get comment of post", sentryMap, Collections.singletonList(SentryTag.COMMENT_OF_POST));
 
                 return response;
             } catch (UncategorizedApiException exc) {
@@ -172,6 +184,13 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
             result.setHasNext(comments.getNextPage() != null);
             result.setHasPrev(comments.getPreviousPage() != null);
 
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentryMap.put("post_id", postId);
+            sentryMap.put("comment_id", commentId);
+            sentrySender.sentryMessage("get sub comments of comment", sentryMap, Collections.singletonList(SentryTag.GET_SUB_COMMENTS));
+
             return result;
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + pageId);
@@ -202,6 +221,14 @@ public class FacebookCommentServiceImpl implements FacebookCommentService {
                 response.setMessage(comment.getMessage());
                 response.setCreatedDate(comment.getCreatedTime());
                 response.setAdapterId(adapterId);
+
+                Map<String, Object> sentryMap = new HashMap<>();
+                sentryMap.put("system_user_id", systemUserId);
+                sentryMap.put("page_id", pageId);
+                sentryMap.put("post_id", postId);
+                sentryMap.put("comment_id", commentId);
+                sentryMap.put("sub_comment_id", subCommentId);
+                sentrySender.sentryMessage("get sub comment of comment", sentryMap, Collections.singletonList(SentryTag.GET_SUB_COMMENTS));
 
                 return response;
             } catch (UncategorizedApiException exc) {

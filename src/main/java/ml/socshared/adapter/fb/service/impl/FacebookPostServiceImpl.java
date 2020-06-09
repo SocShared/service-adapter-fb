@@ -9,6 +9,8 @@ import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookPostService;
+import ml.socshared.adapter.fb.service.sentry.SentrySender;
+import ml.socshared.adapter.fb.service.sentry.SentryTag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.UncategorizedApiException;
@@ -21,11 +23,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -40,6 +38,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
 
     private final FacebookAuthorizationService faService;
     private final FacebookAccessGrantService fagService;
+    private final SentrySender sentrySender;
 
     @Override
     public FacebookPostResponse getPostByPostIdOfPage(UUID systemUserId, String pageId, String postId) {
@@ -77,6 +76,12 @@ public class FacebookPostServiceImpl implements FacebookPostService {
                         response.setViewsCount((Integer) ((Map) ((List) ins.get("values")).get(0)).get("value"));
                     }
                 }
+
+                Map<String, Object> sentryMap = new HashMap<>();
+                sentryMap.put("system_user_id", systemUserId);
+                sentryMap.put("page_id", pageId);
+                sentryMap.put("post_id", postId);
+                sentrySender.sentryMessage("get post of page", sentryMap, Collections.singletonList(SentryTag.GET_POST));
 
                 return response;
             } catch (UncategorizedApiException exc) {
@@ -142,6 +147,11 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             postPages.setPage(page);
             postPages.setObjects(facebookPostServiceList);
 
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentrySender.sentryMessage("get posts of page", sentryMap, Collections.singletonList(SentryTag.GET_POSTS));
+
             return postPages;
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + pageId);
@@ -161,6 +171,12 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             postData.message(request.getMessage());
 
             String id = faService.getConnection(accessGrant).getApi().feedOperations().post(postData);
+
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentryMap.put("post_data", postData);
+            sentrySender.sentryMessage("add post", sentryMap, Collections.singletonList(SentryTag.ADD_POST));
 
             return getPostByPostIdOfPage(systemUserId, pageId, id);
         } catch (UncategorizedApiException exc) {
@@ -182,6 +198,13 @@ public class FacebookPostServiceImpl implements FacebookPostService {
 
             String id = faService.getConnection(accessGrant).getApi().feedOperations().post(postData);
 
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentryMap.put("post_id", postId);
+            sentryMap.put("post_data", postData);
+            sentrySender.sentryMessage("update post", sentryMap, Collections.singletonList(SentryTag.UPDATE_POST));
+
             return getPostByPostIdOfPage(systemUserId, pageId, id);
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + pageId);
@@ -196,6 +219,12 @@ public class FacebookPostServiceImpl implements FacebookPostService {
         try {
             Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class, "access_token");
             accessGrant = new AccessGrant((String) page.get("access_token"));
+
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentryMap.put("post_id", postId);
+            sentrySender.sentryMessage("update post", sentryMap, Collections.singletonList(SentryTag.DELETE_POST));
 
             faService.getConnection(accessGrant).getApi().feedOperations().deletePost(postId);
         } catch (UncategorizedApiException exc) {

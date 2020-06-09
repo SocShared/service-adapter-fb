@@ -10,6 +10,8 @@ import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
 import ml.socshared.adapter.fb.service.FacebookGroupService;
+import ml.socshared.adapter.fb.service.sentry.SentrySender;
+import ml.socshared.adapter.fb.service.sentry.SentryTag;
 import ml.socshared.adapter.fb.service.util.GroupBuffer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,6 +38,7 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
     private final FacebookAuthorizationService faService;
     private final FacebookAccessGrantService fagService;
     private final GroupBuffer groupBuffer;
+    private final SentrySender sentrySender;
 
     @Override
     public Page<FacebookGroupResponse> findGroupsBySystemUserId(UUID systemUserId, Integer page, Integer size) {
@@ -68,6 +71,10 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         pageResponse.setPage(page);
         pageResponse.setSize(size);
         pageResponse.setHasPrev(page != 0);
+
+        Map<String, Object> sentryMap = new HashMap<>();
+        sentryMap.put("system_user_id", systemUserId);
+        sentrySender.sentryMessage("get groups of user", sentryMap, Collections.singletonList(SentryTag.GET_USER_GROUPS));
 
         return pageResponse;
     }
@@ -113,6 +120,10 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
         pageResponse.setHasPrev(pages.getPreviousPage() != null && page != 0);
         pageResponse.setHasNext(pages.getNextPage() != null && facebookGroupResponseList.size() == size);
 
+        Map<String, Object> sentryMap = new HashMap<>();
+        sentryMap.put("system_user_id", systemUserId);
+        sentrySender.sentryMessage("get pages of user", sentryMap, Collections.singletonList(SentryTag.GET_USER_GROUPS));
+
         return pageResponse;
     }
 
@@ -137,6 +148,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
 
         log.info("Facebook Group: {}", response);
 
+        Map<String, Object> sentryMap = new HashMap<>();
+        sentryMap.put("system_user_id", systemUserId);
+        sentryMap.put("group_id", groupId);
+        sentrySender.sentryMessage("get group of user", sentryMap, Collections.singletonList(SentryTag.GET_USER_GROUP));
+
         return response;
     }
 
@@ -158,6 +174,11 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
             response.setType(TypeGroup.FB_PAGE);
 
             log.info("Facebook Group: {}", response);
+
+            Map<String, Object> sentryMap = new HashMap<>();
+            sentryMap.put("system_user_id", systemUserId);
+            sentryMap.put("page_id", pageId);
+            sentrySender.sentryMessage("get page of user", sentryMap, Collections.singletonList(SentryTag.GET_USER_GROUP));
 
             return response;
 

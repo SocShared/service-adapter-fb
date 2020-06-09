@@ -9,6 +9,8 @@ import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
+import ml.socshared.adapter.fb.service.sentry.SentrySender;
+import ml.socshared.adapter.fb.service.sentry.SentryTag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.social.connect.Connection;
@@ -21,6 +23,8 @@ import org.springframework.social.oauth2.OAuth2Operations;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.UUID;
 
 
@@ -34,6 +38,7 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
 
     private final FacebookConnectionFactory factory;
     private final FacebookAccessGrantService fagService;
+    private final SentrySender sentrySender;
 
     @Override
     public String getURLForAccess() {
@@ -46,6 +51,10 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
 
         String url = operations.buildAuthenticateUrl(params);
         log.info("URL-redirect: {}", url);
+
+        HashMap<String, Object> objectHashMap = new HashMap<>();
+        objectHashMap.put("url", url);
+        sentrySender.sentryMessage("url forming", objectHashMap, Collections.singletonList(SentryTag.URL_FORMING));
 
         return url;
     }
