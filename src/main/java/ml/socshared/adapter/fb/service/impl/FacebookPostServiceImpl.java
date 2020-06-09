@@ -175,7 +175,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             Map<String, Object> sentryMap = new HashMap<>();
             sentryMap.put("system_user_id", systemUserId);
             sentryMap.put("page_id", pageId);
-            sentryMap.put("post_data", postData);
+            sentryMap.put("message", request.getMessage());
             sentrySender.sentryMessage("add post", sentryMap, Collections.singletonList(SentryTag.ADD_POST));
 
             return getPostByPostIdOfPage(systemUserId, pageId, id);
@@ -202,7 +202,7 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             sentryMap.put("system_user_id", systemUserId);
             sentryMap.put("page_id", pageId);
             sentryMap.put("post_id", postId);
-            sentryMap.put("post_data", postData);
+            sentryMap.put("message", request.getMessage());
             sentrySender.sentryMessage("update post", sentryMap, Collections.singletonList(SentryTag.UPDATE_POST));
 
             return getPostByPostIdOfPage(systemUserId, pageId, id);
