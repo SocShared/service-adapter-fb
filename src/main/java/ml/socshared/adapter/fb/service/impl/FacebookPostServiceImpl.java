@@ -224,9 +224,10 @@ public class FacebookPostServiceImpl implements FacebookPostService {
             sentryMap.put("system_user_id", systemUserId);
             sentryMap.put("page_id", pageId);
             sentryMap.put("post_id", postId);
-            sentrySender.sentryMessage("update post", sentryMap, Collections.singletonList(SentryTag.DELETE_POST));
 
             faService.getConnection(accessGrant).getApi().feedOperations().deletePost(postId);
+
+            sentrySender.sentryMessage("delete post", sentryMap, Collections.singletonList(SentryTag.DELETE_POST));
         } catch (UncategorizedApiException exc) {
             throw new HttpNotFoundException("Not found page by id: " + pageId);
         }
