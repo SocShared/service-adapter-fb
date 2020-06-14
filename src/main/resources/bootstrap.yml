@@ -17,5 +17,8 @@ cache:
   comments: comments
   super_comments: super_comments
 
+service:
+  id: f7e14d85-415c-4ab9-b285-a6481d79f507
+
 jwt:
   secret: ${SECRET_JWT_KEY:d282dc035756736e54761761cc52bef78e3c473fa7de8f617c14f0e0ae7044aae8ba4b7bed7d532d4af91122e50b39a8bb99e320f72094547d7cae108e928460}

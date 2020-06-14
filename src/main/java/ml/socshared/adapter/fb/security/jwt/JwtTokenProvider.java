@@ -22,6 +22,8 @@ public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
     private String secretKey;
+    @Value("${service.id}")
+    private String serviceId;
 
     private final AuthClient authClient;
 
@@ -39,7 +41,7 @@ public class JwtTokenProvider {
     public boolean validateServiceToken(String token) {
         try {
             Jws<Claims> claims = getJwsClaimsFromToken(token);
-
+            String toServiceId = claims.getBody().get("to_service", String.class);
             Date date = claims.getBody().getExpiration();
             if (date.before(new Date())) {
                 log.warn("JWT Token is expired.");
@@ -49,7 +51,7 @@ public class JwtTokenProvider {
             CheckTokenRequest request = new CheckTokenRequest();
             request.setToken(token);
 
-            return authClient.send(request).getSuccess();
+            return serviceId.equals(toServiceId) && authClient.send(request).getSuccess();
         } catch (JwtException | IllegalArgumentException exc) {
             if (exc instanceof ExpiredJwtException) {
                 log.warn("JWT Token is expired.");
