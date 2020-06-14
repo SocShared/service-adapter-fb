@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
@@ -36,7 +37,7 @@ public class FacebookGroupController implements FacebookGroupApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/groups/{pageId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{pageId}")
     public FacebookGroupResponse getGroup(@PathVariable UUID systemUserId, @PathVariable String pageId) {
 
         return groupService.findPageBySystemUserIdAndPageId(systemUserId, pageId);
@@ -44,7 +45,7 @@ public class FacebookGroupController implements FacebookGroupApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/groups", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/groups")
     public Page<FacebookGroupResponse> getGroups(@PathVariable UUID systemUserId,
                                                  @Min(0) @NotNull @RequestParam(name = "page", required = false) Integer page,
                                                  @Min(0) @Max(100) @NotNull @RequestParam(name = "size", required = false) Integer size) {

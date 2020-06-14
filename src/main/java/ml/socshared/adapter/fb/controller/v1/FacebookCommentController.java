@@ -20,7 +20,8 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
@@ -30,7 +31,7 @@ public class FacebookCommentController implements FacebookCommentApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments/{commentId}")
     public FacebookCommentResponse getCommentOfPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                     @PathVariable String postId, @PathVariable String commentId) {
 
@@ -39,7 +40,7 @@ public class FacebookCommentController implements FacebookCommentApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}/comments")
     public Page<FacebookCommentResponse> getCommentsByPostId(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                              @PathVariable String postId, @Min(0) @NotNull @RequestParam(value = "page", required = false) Integer page,
                                                              @Min(0) @Max(100) @NotNull @RequestParam(value = "size", required = false) Integer size) {

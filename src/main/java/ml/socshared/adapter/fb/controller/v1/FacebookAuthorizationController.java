@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value = "/api/v1", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+                produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Slf4j
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
@@ -24,7 +25,7 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/access", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/access")
     public AccessUrlResponse getAccessUrl() {
 
         String url = authService.getURLForAccess();
@@ -34,21 +35,21 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/code/{authorizationCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/code/{authorizationCode}")
     public SuccessResponse saveAccountFacebook(@PathVariable UUID systemUserId, @PathVariable String authorizationCode) {
         return authService.saveAccountFacebook(systemUserId, authorizationCode);
     }
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/facebook/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/facebook/data")
     public FacebookUserResponse getUserDataBySystemUserId(@PathVariable UUID systemUserId) {
         return authService.findUserDataBySystemUserId(systemUserId);
     }
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @DeleteMapping(value = "/private/users/{systemUserId}/facebook", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/private/users/{systemUserId}/facebook")
     public void deleteAccountFacebook(@PathVariable UUID systemUserId) {
         authService.deleteFacebookAccount(systemUserId);
     }

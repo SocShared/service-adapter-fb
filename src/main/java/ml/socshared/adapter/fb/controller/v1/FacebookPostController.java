@@ -17,7 +17,8 @@ import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+        produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 @Validated
 @PreAuthorize("isAuthenticated()")
 public class FacebookPostController implements FacebookPostApi {
@@ -30,7 +31,7 @@ public class FacebookPostController implements FacebookPostApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}")
     public FacebookPostResponse getPost(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId) {
 
         return postService.getPostByPostIdOfPage(systemUserId, groupId, groupId + "_" + postId);
@@ -38,7 +39,7 @@ public class FacebookPostController implements FacebookPostApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts")
     public Page<FacebookPostResponse> getPosts(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                                @Min(0) @NotNull @RequestParam(name = "page", required = false) Integer page,
                                                @Min(0) @Max(100) @NotNull @RequestParam(name = "size", required = false) Integer size) {
@@ -48,8 +49,7 @@ public class FacebookPostController implements FacebookPostApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @PostMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts")
     public FacebookPostResponse addPost(@PathVariable UUID systemUserId, @PathVariable String groupId,
                                         @RequestBody FacebookPostRequest request) {
 
@@ -58,8 +58,7 @@ public class FacebookPostController implements FacebookPostApi {
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @PatchMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/private/users/{systemUserId}/groups/{groupId}/posts/{postId}")
     public FacebookPostResponse updatePost(@PathVariable UUID systemUserId, @PathVariable String groupId, @PathVariable String postId,
                                            @RequestBody FacebookPostRequest request) {
 
