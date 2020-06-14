@@ -163,14 +163,14 @@ public class FacebookGroupServiceImpl implements FacebookGroupService {
 
         try {
             Map page = faService.getConnection(accessGrant).getApi().fetchObject(pageId, Map.class,
-                    "id", "name", "talking_about_count");
+                    "id", "name", "fan_count");
 
             FacebookGroupResponse response = new FacebookGroupResponse();
             response.setSystemUserId(systemUserId);
             response.setGroupId((String) page.get("id"));
             response.setName((String) page.get("name"));
             response.setAdapterId(adapterId);
-            response.setMembersCount((Integer) page.get("talking_about_count"));
+            response.setMembersCount((Integer) page.get("fan_count"));
             response.setType(TypeGroup.FB_PAGE);
 
             log.info("Facebook Group: {}", response);
