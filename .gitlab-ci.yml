@@ -12,9 +12,7 @@ before_script:
 build:
   stage: build
   script: ./gradlew clean build
-  artifacts:
-    paths:
-      - build/libs/socshared-adapter-fb-1.0.0-SNAPSHOT.jar
+
 
 docker-build:
   stage: docker-build
