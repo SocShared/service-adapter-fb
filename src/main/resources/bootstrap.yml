@@ -2,7 +2,7 @@ server:
   port: 8081
 spring:
   application:
-    name: socshared-adapter-fb
+    name: fb-adapter
   profiles:
     active: ${SPRING_PROFILE:local}
   social:
