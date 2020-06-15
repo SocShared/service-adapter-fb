@@ -14,7 +14,7 @@ public enum SentryTag {
     GET_USER_GROUP("type", "get_user_group"),
     GET_POSTS("type", "get_posts"),
     GET_POST("type", "get_post_by_id"),
-    ADD_POST("type", "get_post_by_id"),
+    ADD_POST("type", "add_post"),
     UPDATE_POST("type", "update_post"),
     DELETE_POST("type", "delete_post");
 
