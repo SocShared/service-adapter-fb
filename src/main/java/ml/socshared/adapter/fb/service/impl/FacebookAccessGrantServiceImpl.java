@@ -3,6 +3,7 @@ package ml.socshared.adapter.fb.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
+import ml.socshared.adapter.fb.domain.response.AccountCountResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpNotFoundException;
 import ml.socshared.adapter.fb.repository.FacebookAccessGrantRepository;
 import ml.socshared.adapter.fb.service.FacebookAccessGrantService;
@@ -64,5 +65,12 @@ public class FacebookAccessGrantServiceImpl implements FacebookAccessGrantServic
         log.info("Facebook Access Grant: id - {}", systemUserId);
 
         sentrySender.sentryMessage("remove facebook account", new HashMap<>(), Collections.singletonList(SentryTag.REMOVE_ACCOUNT));
+    }
+
+    @Override
+    public AccountCountResponse count() {
+        return AccountCountResponse.builder()
+                .count(repository.count())
+                .build();
     }
 }

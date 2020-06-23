@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.api.v1.rest.FacebookAuthorizationApi;
 import ml.socshared.adapter.fb.domain.response.AccessUrlResponse;
+import ml.socshared.adapter.fb.domain.response.AccountCountResponse;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.service.FacebookAuthorizationService;
@@ -51,5 +52,12 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
     @DeleteMapping(value = "/private/users/{systemUserId}/facebook")
     public void deleteAccountFacebook(@PathVariable UUID systemUserId) {
         authService.deleteFacebookAccount(systemUserId);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('SERVICE')")
+    @DeleteMapping(value = "/private/account/count")
+    public AccountCountResponse accountCount() {
+        return authService.count();
     }
 }

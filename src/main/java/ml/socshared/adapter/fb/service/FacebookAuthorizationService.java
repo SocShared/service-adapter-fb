@@ -1,5 +1,6 @@
 package ml.socshared.adapter.fb.service;
 
+import ml.socshared.adapter.fb.domain.response.AccountCountResponse;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import org.springframework.social.connect.Connection;
@@ -17,5 +18,6 @@ public interface FacebookAuthorizationService {
     FacebookTemplate getFacebookTemplate(String accessToken);
     FacebookUserResponse findUserDataBySystemUserId(UUID systemUserId);
     void deleteFacebookAccount(UUID systemUserId);
+    AccountCountResponse count();
 
 }

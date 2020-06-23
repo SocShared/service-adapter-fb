@@ -3,6 +3,7 @@ package ml.socshared.adapter.fb.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ml.socshared.adapter.fb.domain.FacebookAccessGrant;
+import ml.socshared.adapter.fb.domain.response.AccountCountResponse;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import ml.socshared.adapter.fb.exception.impl.HttpBadRequestException;
@@ -128,5 +129,10 @@ public class FacebookAuthorizationServiceImpl implements FacebookAuthorizationSe
     @Override
     public void deleteFacebookAccount(UUID systemUserId) {
         fagService.deleteBySystemUserId(systemUserId);
+    }
+
+    @Override
+    public AccountCountResponse count() {
+        return fagService.count();
     }
 }

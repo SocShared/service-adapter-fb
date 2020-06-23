@@ -3,6 +3,7 @@ package ml.socshared.adapter.fb.api.v1.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import ml.socshared.adapter.fb.domain.response.AccessUrlResponse;
+import ml.socshared.adapter.fb.domain.response.AccountCountResponse;
 import ml.socshared.adapter.fb.domain.response.FacebookUserResponse;
 import ml.socshared.adapter.fb.domain.response.SuccessResponse;
 import org.springframework.social.oauth2.AccessGrant;
@@ -25,5 +26,7 @@ public interface FacebookAuthorizationApi {
     AccessUrlResponse getAccessUrl();
 
     void deleteAccountFacebook(UUID systemUserId);
+
+    AccountCountResponse accountCount();
 
 }
