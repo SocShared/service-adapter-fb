@@ -56,7 +56,7 @@ public class FacebookAuthorizationController implements FacebookAuthorizationApi
 
     @Override
     @PreAuthorize("hasRole('SERVICE')")
-    @DeleteMapping(value = "/private/account/count")
+    @GetMapping(value = "/private/account/count")
     public AccountCountResponse accountCount() {
         return authService.count();
     }
